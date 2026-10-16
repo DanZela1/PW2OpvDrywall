@@ -1,92 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <title>Registro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <title>Solicitar cotización</title>
+    <script type="module" src="../src/main.js"></script>
 </head>
+
 <body class="body-reg">
-     <header aria-label="Cabecera principal">
-    <div class="navbar container">
-        <div class="logo">
-         
-           
-                <img src="../assets/logo_1.png" alt="OPV Drywall - Instalación y Acabado Profesional">
-           
+    {{> header}}
+
+    <main class="main-reg">
+
+        <div class="form-container">
+            <h2>Solicitar cotización</h2>
+            <form id="commentForm" novalidate>
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name">
+                <span class="error" id="nameError">El nombre es requerido.</span>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+                <span class="error" id="emailError">El email es requerido y debe ser válido.</span>
+
+                <label for="phone">Teléfono:</label>
+                <input type="tel" id="phone" name="phone">
+                <span class="error" id="phoneError">El teléfono debe tener entre 8 y 10 dígitos.</span>
+
+                <label for="service">Tipo de servicio:</label>
+                <select id="service" name="service">
+                    <option value="">Selecciona una opción</option>
+                    <option>Estructura Residencial</option>
+                    <option>Estructura Comercial</option>
+                    <option>Aislamiento</option>
+                    <option>Paneles de Yeso</option>
+                    <option>Revestimiento de Paredes</option>
+                    <option>Techado</option>
+                </select>
+                <span class="error" id="serviceError">Selecciona el tipo de servicio.</span>
+
+                <label for="location">Ubicación del proyecto:</label>
+                <input type="text" id="location" name="location">
+                <span class="error" id="locationError">La ubicación es requerida.</span>
+
+                <label for="description">Descripción breve:</label>
+                <textarea id="description" name="description" rows="4" maxlength="1000"></textarea>
+                <span class="error" id="descriptionError">Cuéntanos brevemente tu proyecto.</span>
+
+                <button id="btnSubmit" type="submit">Enviar</button>
+                <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+            </form>
         </div>
 
-        <nav aria-label="Menú principal">
-            <ul>
-                <li><a href = "../index.html" href="#inicio">Inicio</a></li>
-                <li><a href = "../html/galeria.html" href="#galeria">Galería</a></li>
-                <li><a href = "../html/preguntasFrecuentes.html" href="#faq">Preguntas frecuentes</a></li>
-                <li><a href = "../html/nuestrosProgramas.html" href="#programas">Nuestros Programas</a></li>
-                <li><a href = "../html/testimonios.html" href="#testimonio">Testimonios</a></li>
-                <li><a href = "../html/porqueOpv.html" href="#porque-opv">Por qué OPV Drywall</a></li>
-                <li><a href = "../html/acercaDe.html" href="#acerca">Acerca de Nosotros</a></li>
-                <li><a href = "../html/contactenos.html" href="#porque-opv">Contacto</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+    </main>
+    {{> footer}}
 
+    <script type="module" src="../javascript/javascript.js"></script>
 
-<main class="main-reg">
-
-  <div class="form-container">
-        <h2>Registro</h2>
-        <form id="commentForm" novalidate>
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" name="name">
-            <span class="error" id="nameError">El nombre es requerido.</span>
-
-            <label for="correo">Email:</label>
-            <input type="email" id="email" name="email">
-            <span class="error" id="emailError">El email es requerido y debe ser válido.</span>
-
-            <label for="phone">Teléfono:</label>
-            <input type="tel" id="phone" name="phone">
-            <span class="error" id="phoneError">El número de teléfono es requerido.</span>
-
-            <button id="btnSubmit" type="submit">Enviar</button>
-        </form>
-    </div>
-
-
-</main>
-
-
-<footer>
-    <div class="container">
-        <div class="footer-links">
-            <a href = "../html/terminosYcondiciones.html" href="#ter">Términos y condiciones</a>
-            <a href = "../html/terminosYcondiciones.html" href="#ter">Política de privacidad</a>
-            <a href="mailto:opvdrywall@gmail.com">Contacto</a>
-        </div>
-
-        <div class="social">
-            <a href="https://www.facebook.com/share/1DHx5wUqkY/?mibextid=wwXIfr" target="_blank" aria-label="Facebook OPV Drywall">
-                <i class="fab fa-facebook-f"></i>
-                <img src="../assets/facebook.png" alt="Facebook" class="icon"/>
-            </a>
-            <a href="https://www.tiktok.com/@opv.drywall" target="_blank" aria-label="TikTok OPV Drywall">
-                <i class="fab fa-tiktok"></i>
-                <img src="../assets/tiktok.png" alt="Tiktok" class="icon">
-            </a>
-            <a href="mailto:opvdrywall@gmail.com" aria-label="Correo OPV Drywall">
-                <i class="fas fa-envelope"></i>
-                <img src="../assets/gmail.png" alt="Gmail" class="icon"/>
-            </a>
-        </div>
-
-        <p style="margin-top: 40px; font-size: 0.95rem; opacity: 0.9;">
-            © 2021 - 2025 OPV Drywall | Fundada el 8 de marzo de 2021<br>
-            Todos los derechos reservados
-        </p>
-    </div>
-</footer>
-<script src="../javascript/javascript.js"></script>
-<script type="module" src="/src/main.js"></script>
 </body>
+
 </html>
