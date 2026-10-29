@@ -39,24 +39,24 @@ Ramas de módulo creadas al inicio (una por desarrollador):
 
 | Rama | Responsable |
 |---|---|
-| `feature/base-config` | Melissa |
-| `feature/auth-usuarios` | Saúl |
-| `feature/cotizaciones` | Stefanny |
-| `feature/servicios-contacto` | Freed |
-| `feature/postulaciones-frontend` | Gustavo |
-| `feature/proyectos-seed-docs` | Kenneth |
+| `Melissa` | Melissa |
+| `Saul` | Saúl |
+| `Stefanny` | Stefanny |
+| `Freed-Roque-Bonilla` | Freed |
+| `Gustavo` | Gustavo |
+| `Matute` | Kenneth |
 
-Cuando existan las tareas en ClickUp, renombrar con su ID: `git branch -m feature/cotizaciones feature/CU-86abc-cotizaciones`.
+Las ramas ya existen en el repositorio con el nombre de cada integrante; el ID de ClickUp va en cada commit y en el PR.
 Si una persona tiene varias tareas, puede abrir varias ramas/PR a partir de la suya (mejor commits pequeños y varios PR).
 
 ```powershell
 git checkout main
 git pull
-git checkout feature/cotizaciones          # tu rama de módulo (o crea una nueva: git checkout -b feature/CU-86abc-xxx)
+git checkout Stefanny          # tu rama (ejemplo): Melissa, Saul, Stefanny, Freed-Roque-Bonilla, Gustavo, Matute, Fabricio o Juan
 # ... trabajar ...
-git add backend/src/controllers/cotizacion.controller.js
+git add backend/src/controllers/cotizacion.controller.ts
 git commit -m "feat(cotizaciones): agrega POST /api/cotizaciones (CU-86abc123)"
-git push -u origin feature/cotizaciones
+git push -u origin Stefanny
 ```
 Luego abrir el Pull Request en GitHub (la plantilla se llena sola) y mover la tarea a `Review`.
 
@@ -77,7 +77,7 @@ Los módulos dependen de una base común. Cada PR debe dejar el servidor arranca
 1. **PR 1 (Melissa):** config, utilidades, middleware de errores/validación, modelo Usuario → merge a `main`.
 2. **PR 2 (Saúl):** middlewares de seguridad, Auth y Usuarios → merge a `main`.
 3. **PR 3 a 6 en paralelo** (Stefanny, Freed, Gustavo, Kenneth): cada uno agrega los archivos de su módulo.
-4. Cada módulo agrega **sus propias líneas** en los archivos compartidos `models/index.js` y `routes/index.js`
+4. Cada módulo agrega **sus propias líneas** en los archivos compartidos `models/index.ts` y `routes/index.ts`
    (por eso esos dos archivos se tocan con cuidado y se hace `git pull` antes).
 5. Al final, Kenneth integra el README y se ejecuta la colección completa de Postman.
 
@@ -85,12 +85,12 @@ Archivos de cada módulo (para no pisarse):
 
 | Módulo | Responsable | Archivos |
 |---|---|---|
-| Base | Melissa | `config/database.js`, `utils/*`, `middlewares/errorHandler.js`, `middlewares/validar.js`, `validators/comunes.js`, `models/Usuario.js`, `models/index.js`, `app.js`, `server.js`, `package.json`, `.env.example` |
-| Auth y Usuarios | Saúl | `middlewares/auth.js`, `validators/auth.validator.js`, `controllers/auth.controller.js`, `routes/auth.routes.js`, `validators/usuario.validator.js`, `controllers/usuario.controller.js`, `routes/usuarios.routes.js` |
-| Cotizaciones | Stefanny | `models/Cotizacion.js`, `validators/cotizacion.validator.js`, `controllers/cotizacion.controller.js`, `routes/cotizaciones.routes.js` |
-| Servicios y Contacto | Freed | `models/Servicio.js`, `models/Contacto.js` y sus `validators/`, `controllers/`, `routes/` |
-| Postulaciones y formulario | Gustavo | `models/Postulacion.js`, `validators/postulacion.validator.js`, `controllers/postulacion.controller.js`, `routes/postulaciones.routes.js`, `html/formRegistro.html`, `javascript/javascript.js`, `styles/_registro.less` |
-| Proyectos, seed y docs | Kenneth | `models/Proyecto.js`, `validators/proyecto.validator.js`, `controllers/proyecto.controller.js`, `routes/proyectos.routes.js`, `seed.js`, `backend/README.md` |
+| Base | Melissa | `config/database.ts`, `utils/*`, `middlewares/errorHandler.ts`, `middlewares/validar.ts`, `validators/comunes.js`, `models/Usuario.ts`, `models/index.ts`, `app.js`, `server.js`, `package.json`, `.env.example` |
+| Auth y Usuarios | Saúl | `middlewares/auth.ts`, `validators/auth.validator.ts`, `controllers/auth.controller.ts`, `routes/auth.routes.ts`, `validators/usuario.validator.ts`, `controllers/usuario.controller.ts`, `routes/usuarios.routes.ts` |
+| Cotizaciones | Stefanny | `models/Cotizacion.ts`, `validators/cotizacion.validator.ts`, `controllers/cotizacion.controller.ts`, `routes/cotizaciones.routes.ts` |
+| Servicios y Contacto | Freed | `models/Servicio.ts`, `models/Contacto.ts` y sus `validators/`, `controllers/`, `routes/` |
+| Postulaciones y formulario | Gustavo | `models/Postulacion.ts`, `validators/postulacion.validator.ts`, `controllers/postulacion.controller.ts`, `routes/postulaciones.routes.ts`, `html/formRegistro.html`, `javascript/javascript.js`, `styles/_registro.less` |
+| Proyectos, seed y docs | Kenneth | `models/Proyecto.ts`, `validators/proyecto.validator.ts`, `controllers/proyecto.controller.ts`, `routes/proyectos.routes.ts`, `seed.ts`, `backend/README.md` |
 
 Si dos personas modifican el mismo archivo, resolver el conflicto en VS Code (*Accept Current / Incoming / Both*) y probar que el servidor arranca.
 
@@ -112,7 +112,11 @@ El repositorio es **público** (necesario para GitHub Pages gratis). No subir n�
 
 PR1 (Melissa, base) → PR2 (Saúl, auth/usuarios) → PR3, PR4 y PR5 (Stefanny, Freed, Gustavo; en paralelo) → PR6 (Kenneth; requiere PR3).
 
-- Los modelos, rutas y seeds se cargan automáticamente (`models/index.js`, `routes/index.js`, `seed.js`), por eso cada PR solo agrega archivos nuevos y no hay conflictos.
-- PR6 reemplaza `cotizacion.controller.js` (agrega el `include` de Proyecto): hacer merge después de PR3.
+- Los modelos, rutas y seeds se cargan automáticamente (`models/index.ts`, `routes/index.ts`, `seed.ts`), por eso cada PR solo agrega archivos nuevos y no hay conflictos.
+- PR6 reemplaza `cotizacion.controller.ts` (agrega el `include` de Proyecto): hacer merge después de PR3.
 - El seed del admin lo hace Melissa (PR1); el de servicios, Freed (PR4).
 - Cada merge deja el servidor arrancando (`npm run dev`).
+
+## Nota: el backend está en TypeScript
+
+Todo el código de `backend/src` está en TypeScript (`.ts`). `npm run dev` usa nodemon con ts-node, `npm run build` compila a `dist/` y `npm start` corre lo compilado. Antes de abrir un PR, además de probar con Postman, ejecutar `npm run typecheck` para confirmar que no hay errores de tipos.
