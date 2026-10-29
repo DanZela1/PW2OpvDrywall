@@ -1,12 +1,11 @@
 const { matchedData } = require('express-validator');
-const { Cotizacion, Proyecto } = require('../models');
+const { Cotizacion } = require('../models');
 const ApiError = require('../utils/ApiError');
 const crearCrud = require('../utils/crudFactory');
 const h = require('../utils/asyncHandler');
 
 const crud = crearCrud(Cotizacion, {
   nombre: 'Cotización',
-  include: [{ model: Proyecto, as: 'proyecto', attributes: ['id', 'codigo', 'estado'] }],
   // Si quien envía está logueado, la cotización queda asociada a su usuario
   antesDeCrear: async (req, datos) => ({ ...datos, usuarioId: req.user?.id ?? null }),
 });
