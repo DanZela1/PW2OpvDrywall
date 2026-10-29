@@ -1,0 +1,568 @@
+{
+  "info": {
+    "name": "OPV Drywall - 06 Archivos (im\u00e1genes y CV)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Login admin (guarda el token)",
+      "request": {
+        "url": {
+          "path": [
+            "auth",
+            "login"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/auth/login"
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"admin@opvdrywall.com\",\n  \"password\": \"Admin123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 login\", () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set(\"token\", pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Postulaci\u00f3n con CV (p\u00fablico)",
+      "request": {
+        "url": {
+          "path": [
+            "postulaciones"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/postulaciones"
+        },
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "nombre",
+              "value": "Ana P\u00e9rez",
+              "type": "text"
+            },
+            {
+              "key": "correo",
+              "value": "ana.archivos@mail.com",
+              "type": "text"
+            },
+            {
+              "key": "telefono",
+              "value": "99887766",
+              "type": "text"
+            },
+            {
+              "key": "experiencia",
+              "value": "5 a\u00f1os de drywall",
+              "type": "text"
+            },
+            {
+              "key": "cv",
+              "type": "file"
+            }
+          ]
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"201 creada\", () => pm.response.to.have.status(201));",
+              "const d = pm.response.json();",
+              "pm.test(\"trae cv y cvUrl\", () => { pm.expect(d.cv).to.be.a(\"string\"); pm.expect(d.cvUrl).to.include(\"/cv\"); });",
+              "pm.collectionVariables.set(\"postulacionId\", d.id);",
+              "pm.collectionVariables.set(\"cvNombre\", d.cv);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. CV con tipo no permitido (debe dar 400)",
+      "request": {
+        "url": {
+          "path": [
+            "postulaciones"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/postulaciones"
+        },
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "nombre",
+              "value": "Prueba",
+              "type": "text"
+            },
+            {
+              "key": "correo",
+              "value": "prueba@mail.com",
+              "type": "text"
+            },
+            {
+              "key": "telefono",
+              "value": "99887766",
+              "type": "text"
+            },
+            {
+              "key": "cv",
+              "type": "file"
+            }
+          ]
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"400 rechazado\", () => pm.response.to.have.status(400));",
+              "pm.test(\"explica el formato\", () => pm.expect(pm.response.json().error).to.include(\"Formatos v\u00e1lidos\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Descargar CV SIN token (debe dar 401)",
+      "request": {
+        "url": {
+          "path": [
+            "postulaciones",
+            "{{postulacionId}}",
+            "cv"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/postulaciones/{{postulacionId}}/cv"
+        },
+        "method": "GET",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"401 sin token\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Descargar CV como admin",
+      "request": {
+        "url": {
+          "path": [
+            "postulaciones",
+            "{{postulacionId}}",
+            "cv"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/postulaciones/{{postulacionId}}/cv"
+        },
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "type": "string",
+              "value": "{{token}}",
+              "key": "token"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 descarga\", () => pm.response.to.have.status(200));",
+              "pm.test(\"es un archivo adjunto\", () => pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Reemplazar el CV (PUT, admin)",
+      "request": {
+        "url": {
+          "path": [
+            "postulaciones",
+            "{{postulacionId}}"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/postulaciones/{{postulacionId}}"
+        },
+        "method": "PUT",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "cv",
+              "type": "file"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "type": "string",
+              "value": "{{token}}",
+              "key": "token"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 actualizada\", () => pm.response.to.have.status(200));",
+              "pm.test(\"el CV cambi\u00f3\", () => pm.expect(pm.response.json().cv).to.not.eql(pm.collectionVariables.get(\"cvNombre\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Servicio con imagen (admin)",
+      "request": {
+        "url": {
+          "path": [
+            "servicios"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/servicios"
+        },
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "nombre",
+              "value": "Servicio con imagen {{$timestamp}}",
+              "type": "text"
+            },
+            {
+              "key": "descripcion",
+              "value": "Servicio de prueba con foto",
+              "type": "text"
+            },
+            {
+              "key": "categoria",
+              "value": "pruebas",
+              "type": "text"
+            },
+            {
+              "key": "activo",
+              "value": "true",
+              "type": "text"
+            },
+            {
+              "key": "imagen",
+              "type": "file"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "type": "string",
+              "value": "{{token}}",
+              "key": "token"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"201 creado\", () => pm.response.to.have.status(201));",
+              "const d = pm.response.json();",
+              "pm.test(\"trae la ruta de la imagen\", () => pm.expect(d.imagen).to.match(/^\\/uploads\\/imagenes\\//));",
+              "pm.collectionVariables.set(\"servicioId\", d.id);",
+              "pm.collectionVariables.set(\"imagenUrl\", d.imagen);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Ver la imagen (p\u00fablica, sin token)",
+      "request": {
+        "url": {
+          "host": [
+            "{{host}}{{imagenUrl}}"
+          ],
+          "raw": "{{host}}{{imagenUrl}}"
+        },
+        "method": "GET",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 imagen\", () => pm.response.to.have.status(200));",
+              "pm.test(\"es una imagen\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"image/\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Reemplazar la imagen (PUT, admin)",
+      "request": {
+        "url": {
+          "path": [
+            "servicios",
+            "{{servicioId}}"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/servicios/{{servicioId}}"
+        },
+        "method": "PUT",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "imagen",
+              "type": "file"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "type": "string",
+              "value": "{{token}}",
+              "key": "token"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 actualizado\", () => pm.response.to.have.status(200));",
+              "pm.test(\"la imagen cambi\u00f3\", () => pm.expect(pm.response.json().imagen).to.not.eql(pm.collectionVariables.get(\"imagenUrl\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Servicio con imagen SIN token (debe dar 401)",
+      "request": {
+        "url": {
+          "path": [
+            "servicios"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/servicios"
+        },
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "nombre",
+              "value": "No debe crearse",
+              "type": "text"
+            },
+            {
+              "key": "descripcion",
+              "value": "x",
+              "type": "text"
+            },
+            {
+              "key": "categoria",
+              "value": "x",
+              "type": "text"
+            },
+            {
+              "key": "imagen",
+              "type": "file"
+            }
+          ]
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"401 sin token\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Eliminar servicio (borra su imagen)",
+      "request": {
+        "url": {
+          "path": [
+            "servicios",
+            "{{servicioId}}"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/servicios/{{servicioId}}"
+        },
+        "method": "DELETE",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "type": "string",
+              "value": "{{token}}",
+              "key": "token"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 eliminado\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Eliminar postulaci\u00f3n (borra su CV)",
+      "request": {
+        "url": {
+          "path": [
+            "postulaciones",
+            "{{postulacionId}}"
+          ],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "raw": "{{baseUrl}}/postulaciones/{{postulacionId}}"
+        },
+        "method": "DELETE",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "type": "string",
+              "value": "{{token}}",
+              "key": "token"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"200 eliminada\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "type": "any",
+      "value": "http://localhost:3000/api",
+      "key": "baseUrl"
+    },
+    {
+      "type": "any",
+      "value": "http://localhost:3000",
+      "key": "host"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "token"
+    }
+  ]
+}
