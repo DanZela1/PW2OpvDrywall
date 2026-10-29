@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{baseUrl}}/usuarios"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "X",
+      "correo": "malo",
+      "password": "1",
+      "rol": "dios"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 400", () => pm.response.to.have.status(400));
+      pm.test("400 estandarizado con lista de errores", () => { const j = pm.response.json(); pm.expect(j.error).to.eql("Datos inválidos"); pm.expect(j.errores).to.be.an("array").that.is.not.empty; });
+    language: text/javascript
+order: 3000

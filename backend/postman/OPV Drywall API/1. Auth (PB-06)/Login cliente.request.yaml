@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "correo": "ana@mail.com",
+      "password": "123456"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("devuelve token", () => pm.expect(pm.response.json().token).to.be.a("string"));
+      pm.test("no expone el hash", () => pm.expect(pm.response.json().usuario).to.not.have.property("passwordHash"));
+      pm.collectionVariables.set("tokenCliente", pm.response.json().token);
+    language: text/javascript
+order: 3000

@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{baseUrl}}/cotizaciones"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Ana Pérez",
+      "correo": "ana@mail.com",
+      "telefono": "99887766",
+      "tipoServicio": "Paneles de Yeso",
+      "ubicacion": "Tegucigalpa",
+      "descripcion": "Sala de 20 m2"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 201", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("cotizacionId", pm.response.json().id);
+    language: text/javascript
+order: 1000

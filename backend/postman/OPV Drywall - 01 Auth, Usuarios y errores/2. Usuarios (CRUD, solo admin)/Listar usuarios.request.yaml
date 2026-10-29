@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/usuarios?limite=10"
+method: GET
+queryParams:
+  limite: "10"
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("paginado", () => { const j = pm.response.json(); pm.expect(j.datos).to.be.an("array"); pm.expect(j.total).to.be.a("number"); });
+    language: text/javascript
+order: 4000

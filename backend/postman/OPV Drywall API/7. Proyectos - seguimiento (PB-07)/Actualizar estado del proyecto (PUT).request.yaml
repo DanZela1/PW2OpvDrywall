@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{baseUrl}}/proyectos/{{proyectoId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "estado": "En ejecución"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("estado actualizado", () => pm.expect(pm.response.json().estado).to.eql("En ejecución"));
+    language: text/javascript
+order: 10000

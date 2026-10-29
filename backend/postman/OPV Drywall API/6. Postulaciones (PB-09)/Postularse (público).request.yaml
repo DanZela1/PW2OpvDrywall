@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{baseUrl}}/postulaciones"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Juan Mejía",
+      "correo": "juan@mail.com",
+      "telefono": "88776655",
+      "experiencia": "5 años instalando drywall"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 201", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("postulacionId", pm.response.json().id);
+      pm.test("estado nueva", () => pm.expect(pm.response.json().estado).to.eql("nueva"));
+    language: text/javascript
+order: 1000

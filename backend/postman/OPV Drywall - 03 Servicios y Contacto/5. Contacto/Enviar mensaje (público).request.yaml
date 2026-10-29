@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/contacto"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Luis",
+      "correo": "luis@mail.com",
+      "mensaje": "Hola, quiero información"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 201", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("contactoId", pm.response.json().id);
+      pm.test("leido=false", () => pm.expect(pm.response.json().leido).to.eql(false));
+    language: text/javascript
+order: 1000

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/usuarios/{{usuarioId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("Status 400", () => pm.response.to.have.status(400));
+    language: text/javascript
+order: 11000

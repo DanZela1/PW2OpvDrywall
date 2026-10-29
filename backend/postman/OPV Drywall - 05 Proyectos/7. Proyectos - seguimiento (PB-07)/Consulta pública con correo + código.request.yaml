@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/proyectos/consulta"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "correo": "ana@mail.com",
+      "codigo": "{{proyectoCodigo}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("devuelve estado y contacto", () => { const j = pm.response.json(); pm.expect(j.estado).to.be.a("string"); pm.expect(j.contacto).to.be.a("string"); });
+    language: text/javascript
+order: 5000

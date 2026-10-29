@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/auth/registro"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Ana Pérez",
+      "correo": "ana@mail.com",
+      "password": "123456"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: pm.test("201 creado o 409 si ya existe", () => pm.expect([201, 409]).to.include(pm.response.code));
+    language: text/javascript
+order: 1000

@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{baseUrl}}/servicios"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Servicio prueba {{sid}}",
+      "descripcion": "Descripción de prueba",
+      "categoria": "Pruebas",
+      "activo": true
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+scripts:
+  - type: beforeRequest
+    code: pm.collectionVariables.set("sid", Date.now());
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Status 201", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("servicioId", pm.response.json().id);
+    language: text/javascript
+order: 2000

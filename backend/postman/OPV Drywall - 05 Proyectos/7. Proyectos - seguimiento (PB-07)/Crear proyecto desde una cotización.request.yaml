@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{baseUrl}}/proyectos"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "cotizacionId": "{{cotizacionId}}"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 201", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("proyectoId", pm.response.json().id);
+      pm.collectionVariables.set("proyectoCodigo", pm.response.json().codigo);
+      pm.test("código OPV-AAAA-NNNN", () => pm.expect(pm.response.json().codigo).to.match(/^OPV-\d{4}-\d{4}$/));
+    language: text/javascript
+order: 1000
