@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <title>Solicitar cotización</title>
+    <script type="module" src="../src/main.ts"></script>
+</head>
+
+<body class="body-reg">
+    {{> header}}
+
+    <main class="main-reg">
+
+        <div class="form-container">
+            <h2>Solicitar cotización</h2>
+            <form id="commentForm" novalidate>
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name">
+                <span class="error" id="nameError">El nombre es requerido.</span>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+                <span class="error" id="emailError">El email es requerido y debe ser válido.</span>
+
+                <label for="phone">Teléfono:</label>
+                <input type="tel" id="phone" name="phone">
+                <span class="error" id="phoneError">El teléfono debe tener entre 8 y 10 dígitos.</span>
+
+                <label for="service">Tipo de servicio:</label>
+                <select id="service" name="service">
+                    <option value="">Selecciona una opción</option>
+                    <option>Estructura Residencial</option>
+                    <option>Estructura Comercial</option>
+                    <option>Aislamiento</option>
+                    <option>Paneles de Yeso</option>
+                    <option>Revestimiento de Paredes</option>
+                    <option>Techado</option>
+                </select>
+                <span class="error" id="serviceError">Selecciona el tipo de servicio.</span>
+
+                <label for="location">Ubicación del proyecto:</label>
+                <input type="text" id="location" name="location">
+                <span class="error" id="locationError">La ubicación es requerida.</span>
+
+                <label for="description">Descripción breve:</label>
+                <textarea id="description" name="description" rows="4" maxlength="1000"></textarea>
+                <span class="error" id="descriptionError">Cuéntanos brevemente tu proyecto.</span>
+
+                <button id="btnSubmit" type="submit">Enviar</button>
+                <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+            </form>
+        </div>
+
+    </main>
+    {{> footer}}
+
+    <script type="module" src="../javascript/javascript.ts"></script>
+
+</body>
+
+</html>

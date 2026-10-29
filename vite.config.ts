@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import purgecss from 'vite-plugin-purgecss'
 import handlebars from 'vite-plugin-handlebars'
 
@@ -10,12 +10,12 @@ const baseProduccion = process.env.VITE_BASE ?? `/${repo}/`
 
 // Vite agrega la base a imágenes, CSS y JS, pero NO a los enlaces <a href="/..."> (menú, footer).
 // Este plugin se la agrega para que la navegación funcione bajo /NOMBRE-DEL-REPO/
-const prefijarEnlaces = (base) => ({
+const prefijarEnlaces = (base: string): Plugin => ({
   name: 'prefijar-enlaces-internos',
   apply: 'build',
   transformIndexHtml: {
     order: 'post',
-    handler: (html) => html.replace(/(<a\b[^>]*\shref=")\/(?!\/)/g, `$1${base}`),
+    handler: (html: string) => html.replace(/(<a\b[^>]*\shref=")\/(?!\/)/g, `$1${base}`),
   },
 })
 
@@ -54,7 +54,7 @@ export default defineConfig(({ command }) => ({
       content: [
         './index.html',
         './html/**/*.html',
-        './javascript/**/*.js',
+        './javascript/**/*.ts',
       ],
     }),
   ],

@@ -4,51 +4,73 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "http://localhost:3000"
         : "https://TU-API.onrender.com";
 
-    const myForm = document.getElementById("commentForm");
+    const myForm = document.getElementById("commentForm") as HTMLFormElement | null;
     if (!myForm) return;
 
-    const campos = {
-        name: { input: document.getElementById("name"), error: document.getElementById("nameError") },
-        email: { input: document.getElementById("email"), error: document.getElementById("emailError") },
-        phone: { input: document.getElementById("phone"), error: document.getElementById("phoneError") },
-        service: { input: document.getElementById("service"), error: document.getElementById("serviceError") },
-        location: { input: document.getElementById("location"), error: document.getElementById("locationError") },
-        description: { input: document.getElementById("description"), error: document.getElementById("descriptionError") },
+    type Campo = { input: CampoFormulario; error: HTMLElement };
+    type CampoFormulario = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    type ClaveCampo = "name" | "email" | "phone" | "service" | "location" | "description";
+    type TipoEstado = "ok" | "error" | "info" | "";
+
+    // Busca un elemento por id y falla con un mensaje claro si el HTML no lo tiene
+    const obtener = <T extends HTMLElement>(id: string): T => {
+        const el = document.getElementById(id);
+        if (!el) throw new Error(`Falta el elemento #${id} en el HTML`);
+        return el as T;
     };
-    const submitButton = document.getElementById("btnSubmit");
-    const formStatus = document.getElementById("formStatus");
+    const campo = (id: string): Campo => ({
+        input: obtener<CampoFormulario>(id),
+        error: obtener<HTMLElement>(`${id}Error`),
+    });
+
+    const campos: Record<ClaveCampo, Campo> = {
+        name: campo("name"),
+        email: campo("email"),
+        phone: campo("phone"),
+        service: campo("service"),
+        location: campo("location"),
+        description: campo("description"),
+    };
+    const submitButton = obtener<HTMLButtonElement>("btnSubmit");
+    const formStatus = obtener<HTMLElement>("formStatus");
+
+    // Forma de la respuesta de error de la API
+    interface RespuestaApi {
+        error?: string;
+        errores?: { campo: string; mensaje: string }[];
+    }
 
     const isEmptyRegex = /^\s*$/;
     const isValidEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValidPhoneRegex = /^\d{8,10}$/;
 
-    const reglas = {
-        name: (v) => !isEmptyRegex.test(v),
-        email: (v) => isValidEmailRegex.test(v),
-        phone: (v) => isValidPhoneRegex.test(v),
-        service: (v) => !isEmptyRegex.test(v),
-        location: (v) => !isEmptyRegex.test(v),
-        description: (v) => !isEmptyRegex.test(v),
+    const reglas: Record<ClaveCampo, (v: string) => boolean> = {
+        name: (v: string) => !isEmptyRegex.test(v),
+        email: (v: string) => isValidEmailRegex.test(v),
+        phone: (v: string) => isValidPhoneRegex.test(v),
+        service: (v: string) => !isEmptyRegex.test(v),
+        location: (v: string) => !isEmptyRegex.test(v),
+        description: (v: string) => !isEmptyRegex.test(v),
     };
 
     // Nombres de clase completos (literales) para que PurgeCSS no los elimine
-    const clasesEstado = {
+    const clasesEstado: Record<Exclude<TipoEstado, "">, string> = {
         ok: "form-status status-ok",
         error: "form-status status-error",
         info: "form-status status-info",
     };
 
-    const mostrarEstado = (texto, tipo) => {
+    const mostrarEstado = (texto: string, tipo: TipoEstado): void => {
         formStatus.textContent = texto;
-        formStatus.className = clasesEstado[tipo] || "form-status";
+        formStatus.className = tipo ? clasesEstado[tipo] : "form-status";
     };
 
-    myForm.addEventListener("submit", async (e) => {
+    myForm.addEventListener("submit", async (e: SubmitEvent) => {
         e.preventDefault();
         mostrarEstado("", "");
         let isValid = true;
 
-        for (const [clave, { input, error }] of Object.entries(campos)) {
+        for (const [clave, { input, error }] of Object.entries(campos) as [ClaveCampo, Campo][]) {
             error.style.display = "none";
             if (!reglas[clave](input.value)) {
                 error.style.display = "block";
@@ -75,14 +97,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(datos),
             });
-            const data = await resp.json();
+            const data = (await resp.json()) as RespuestaApi;
 
             if (resp.ok) {
                 mostrarEstado("Tu solicitud fue enviada correctamente. Te contactaremos pronto.", "ok");
                 myForm.reset();
             } else {
                 // La API responde { error, errores: [{ campo, mensaje }] } cuando los datos son inválidos
-                const detalle = data.errores && data.errores[0] ? data.errores[0].mensaje : data.error;
+                const detalle = data.errores?.[0]?.mensaje ?? data.error;
                 mostrarEstado(detalle || "No se pudo enviar la solicitud.", "error");
             }
         } catch (err) {

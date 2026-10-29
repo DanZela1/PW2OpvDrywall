@@ -1,0 +1,6 @@
+FRONTEND EN TYPESCRIPT
+1) Copia estos archivos sobre el repo (misma ruta).
+2) BORRA los viejos:  javascript/javascript.js   src/main.js   vite.config.js
+   git rm javascript/javascript.js src/main.js vite.config.js
+3) npm install ; npm run typecheck ; npm run build
+Vite compila el .ts solo: no hace falta subir ningun .js compilado.
