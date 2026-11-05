@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import routes from './routes';
+import { setupSwagger } from './config/swagger';
 import { notFound, errorHandler } from './middlewares/errorHandler';
 
 dotenv.config();
@@ -16,6 +17,8 @@ const origenes = (process.env.CORS_ORIGINS || 'http://localhost:5173')
 app.use(cors({ origin: origenes }));
 app.use(morgan('dev')); // registra cada petición HTTP en consola
 app.use(express.json({ limit: '100kb' }));
+
+setupSwagger(app); // documentación en /api-docs
 
 app.use('/api', routes);
 
