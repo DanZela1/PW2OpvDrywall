@@ -3,6 +3,7 @@ import c from '../controllers/servicio.controller';
 import * as v from '../validators/servicio.validator';
 import validar from '../middlewares/validar';
 import { auth, soloAdmin } from '../middlewares/auth';
+import { subirImagen } from '../middlewares/subida';
 
 const router = Router();
 

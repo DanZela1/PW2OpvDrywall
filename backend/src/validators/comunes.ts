@@ -44,8 +44,9 @@ export const booleano = (campo: string, { requerido = false }: Opciones = {}): V
   inicio(campo, requerido).isBoolean().withMessage(`${campo} debe ser true o false`).toBoolean();
 
 // En las actualizaciones (PUT) exige que se envíe al menos un campo
+// (un archivo adjunto cuenta como cambio, para poder reemplazar solo la imagen o el CV)
 export const alMenosUnCampo: ValidationChain = body()
-  .custom((valor) => valor && typeof valor === 'object' && Object.keys(valor).length > 0)
-  .withMessage('Envía al menos un campo para actualizar');
+  .custom((valor, { req }) => !!req.file || (valor && typeof valor === 'object' && Object.keys(valor).length > 0))
+  .withMessage('Envía al menos un campo o un archivo para actualizar');
 
 export { body, query };

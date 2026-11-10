@@ -3,6 +3,7 @@ import c from '../controllers/postulacion.controller';
 import * as v from '../validators/postulacion.validator';
 import validar from '../middlewares/validar';
 import { auth, soloAdmin } from '../middlewares/auth';
+import { subirCV } from '../middlewares/subida';
 
 const router = Router();
 

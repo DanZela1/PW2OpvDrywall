@@ -113,6 +113,7 @@ Los listados aceptan `?pagina=1&limite=20` y devuelven `{ total, pagina, limite,
 | Contacto | `GET` · `GET /:id` · `PUT /:id` · `DELETE /:id` | Admin | PB-02 |
 | Postulaciones | `POST /api/postulaciones` | Público | PB-09 |
 | Postulaciones | `GET?estado=` · `GET /:id` · `PUT /:id` · `PATCH /:id/estado` · `DELETE /:id` | Admin | PB-09 |
+| Postulaciones | `GET /api/postulaciones/:id/cv` (descarga el CV adjunto) | Admin | PB-09 |
 | Proyectos | `POST /api/proyectos/consulta` (correo + código) | Público | PB-07 |
 | Proyectos | `GET` · `GET /:id` · `POST` · `PUT /:id` · `DELETE /:id` | Admin | PB-07 |
 
@@ -138,6 +139,45 @@ Content-Type: application/json
 
 { "nombre": "Ana Pérez", "correo": "ana@mail.com", "telefono": "99887766",
   "tipoServicio": "Paneles de Yeso", "ubicacion": "Tegucigalpa", "descripcion": "Sala de 20 m2" }
+```
+
+## Subida de archivos
+
+La API acepta archivos con `multipart/form-data` (librería **multer**). Si no se envía archivo, las rutas siguen funcionando con JSON como antes.
+
+| Dónde | Campo de archivo | Formatos | Visibilidad |
+|---|---|---|---|
+| `POST` y `PUT /api/servicios` (admin) | `imagen` | `.jpg`, `.png`, `.webp` | **Pública**: queda en `/uploads/imagenes/<archivo>` |
+| `POST` (público) y `PUT /api/postulaciones` (admin) | `cv` | `.pdf`, `.doc`, `.docx` | **Privada**: solo el admin la descarga con `GET /api/postulaciones/:id/cv` |
+
+- **Tamaño máximo:** 5 MB por archivo (cambia con `MAX_UPLOAD_MB` en `.env`). Si se supera responde **413**.
+- **Seguridad:** se valida el tipo declarado *y* los primeros bytes reales del archivo; el nombre se genera aleatorio (nunca se usa el del cliente); SVG y HTML no se aceptan.
+- **Sin archivos huérfanos:** si la petición falla (validación, duplicado, 404...) el archivo subido se borra; al reemplazar o eliminar un registro también se borra el archivo anterior.
+- **Dónde se guardan:** `backend/uploads/` (ignorada por Git). Con `UPLOADS_DIR` en `.env` se puede mover a otra ruta.
+- **Base de datos:** se agregaron `servicios.imagen` y `postulaciones.cv`. Al iniciar (`npm run dev` o `npm run seed`) se crean solas si no existen, no hace falta `ALTER TABLE`. La respuesta de una postulación incluye `cv` (nombre interno) y `cvUrl` (ruta de descarga).
+- **Producción:** en hostings con disco temporal (p. ej. el plan gratuito de Render) los archivos se pierden en cada despliegue. Usa un disco persistente (`UPLOADS_DIR`) o un almacenamiento externo como Cloudinary o S3.
+
+### Ejemplos
+
+```bash
+# Postulación con CV (público)
+curl -X POST http://localhost:3000/api/postulaciones \
+  -F nombre="Ana Pérez" -F correo=ana@mail.com -F telefono=99887766 \
+  -F "cv=@/ruta/mi-cv.pdf"
+
+# Servicio con imagen (admin)
+curl -X POST http://localhost:3000/api/servicios -H "Authorization: Bearer <token>" \
+  -F nombre="Pintura" -F descripcion="Pintura interior" -F categoria=acabados \
+  -F "imagen=@/ruta/foto.jpg"
+```
+
+En Postman: **Body → form-data**, los campos de texto como *Text* y `cv` / `imagen` cambiados a tipo *File*. No pongas el header `Content-Type` a mano.
+
+En el frontend, con `FormData` y **sin** poner `Content-Type` (el navegador agrega el boundary):
+
+```ts
+const datos = new FormData(formulario); // <input type="file" name="cv" accept=".pdf,.doc,.docx">
+await fetch(`${API_URL}/api/postulaciones`, { method: 'POST', body: datos });
 ```
 
 ## Pruebas con Postman

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { sequelize, crearBaseSiNoExiste } from './config/database';
+import { asegurarColumnas } from './config/columnas';
 import './models'; // registra modelos y relaciones antes de sincronizar
 import app from './app';
 
@@ -17,6 +18,7 @@ async function iniciar(): Promise<void> {
     await crearBaseSiNoExiste();
     await sequelize.authenticate();
     await sequelize.sync(); // crea las tablas si no existen
+    await asegurarColumnas(); // agrega columnas de archivos a bases ya creadas
     console.log(`Conectado a MySQL (${process.env.DB_NAME || 'opv_drywall'})`);
     app.listen(PORT, () => console.log(`API corriendo en http://localhost:${PORT}`));
   } catch (err) {
