@@ -1,9 +1,9 @@
-name: Deploy a GitHub Pages
+name: Publicar sitio en GitHub Pages
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main]      # cada vez que se hace merge a main, se vuelve a publicar
+  workflow_dispatch:      # también se puede lanzar a mano desde la pestaña Actions
 
 permissions:
   contents: read
@@ -21,10 +21,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+          node-version: 22
+      - name: Instalar dependencias del sitio (raíz del repo)
+        run: npm install
+      - name: Compilar con Vite
+        run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
