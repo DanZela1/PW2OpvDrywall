@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { crearBaseSiNoExiste } from './config/database';
 import models from './models';
+import { asegurarColumnas } from './config/columnas';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const EXT = path.extname(__filename);
 (async () => {
   await crearBaseSiNoExiste();
   await models.sequelize.sync();
+  await asegurarColumnas();
   // Ejecuta en orden cada archivo seeds/NN-nombre.seed
   const carpeta = path.join(__dirname, 'seeds');
   const archivos = fs.readdirSync(carpeta).filter((f) => f.endsWith(`.seed${EXT}`) && !f.endsWith('.d.ts')).sort();

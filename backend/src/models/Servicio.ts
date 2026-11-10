@@ -8,11 +8,12 @@ export interface ServicioAtributos {
   descripcion: string;
   categoria: string;
   contacto: string | null;
+  imagen: string | null; // ruta pública, ej. /uploads/imagenes/123-ab.jpg
   activo: boolean;
   usuarioId?: number | null; // la agrega la relación con Usuario
 }
 
-type ServicioCreacion = Optional<ServicioAtributos, 'id' | 'contacto' | 'activo' | 'usuarioId'>;
+type ServicioCreacion = Optional<ServicioAtributos, 'id' | 'contacto' | 'imagen' | 'activo' | 'usuarioId'>;
 
 export interface ServicioInstancia extends Model<ServicioAtributos, ServicioCreacion>, ServicioAtributos {}
 
@@ -24,6 +25,7 @@ const Servicio = sequelize.define<ServicioInstancia>(
     descripcion: { type: DataTypes.TEXT, allowNull: false },
     categoria: { type: DataTypes.STRING(60), allowNull: false },
     contacto: { type: DataTypes.STRING(120), allowNull: true },
+    imagen: { type: DataTypes.STRING(255), allowNull: true },
     activo: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   },
   { tableName: 'servicios' },
