@@ -18,6 +18,11 @@ app.use(cors({ origin: origenes }));
 app.use(morgan('dev')); // registra cada petición HTTP en consola
 app.use(express.json({ limit: '100kb' }));
 
+setupSwagger(app); // documentación en /api-docs
+
+// imágenes públicas de servicios (los CV NO se sirven aquí: se descargan con token de admin)
+app.use('/uploads/imagenes', express.static(CARPETA_IMAGENES));
+
 app.use('/api', routes);
 
 app.use(notFound);
