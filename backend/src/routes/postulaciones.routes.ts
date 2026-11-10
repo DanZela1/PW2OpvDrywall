@@ -112,7 +112,7 @@ const router = Router();
  *       400:
  *         description: Datos inválidos
  */
-router.post('/', v.crear, validar, c.crear); // público (PB-09)
+router.post('/', subirCV, v.crear, validar, c.crear); // público (PB-09)
 
 /**
  * @swagger
@@ -234,7 +234,10 @@ router.get('/:id', auth, soloAdmin, v.id, validar, c.obtener);
  *       404:
  *         description: Postulación no encontrada
  */
-router.put('/:id', auth, soloAdmin, v.actualizar, validar, c.actualizar);
+router.put('/:id', auth, soloAdmin, subirCV, v.actualizar, validar, c.actualizar);
+
+// GET /api/postulaciones/:id/cv -> descarga del CV (solo admin)
+router.get('/:id/cv', auth, soloAdmin, v.id, validar, c.descargarCV);
 
 /**
  * @swagger

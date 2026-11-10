@@ -182,7 +182,7 @@ router.get('/:id', v.id, validar, c.obtener); // público
  *       409:
  *         description: Ya existe un servicio con ese nombre
  */
-router.post('/', auth, soloAdmin, v.crear, validar, c.crear);
+router.post('/', auth, soloAdmin, subirImagen, v.crear, validar, c.crear);
 
 /**
  * @swagger
@@ -220,7 +220,7 @@ router.post('/', auth, soloAdmin, v.crear, validar, c.crear);
  *       404:
  *         description: Servicio no encontrado
  */
-router.put('/:id', auth, soloAdmin, v.actualizar, validar, c.actualizar);
+router.put('/:id', auth, soloAdmin, subirImagen, v.actualizar, validar, c.actualizar);
 
 /**
  * @swagger
