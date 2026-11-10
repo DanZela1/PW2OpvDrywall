@@ -1,7 +1,7 @@
 # OPV Drywall - API (backend)
 
-API REST del Sprint de backend. Stack: **TypeScript + Node.js + Express + Sequelize + MySQL (mysql2)**, validación con **express-validator**,
-autenticación **JWT + bcrypt**, logs con **morgan** y recarga automática con **nodemon** (ejecuta `ts-node`).
+API REST del Sprint de backend. Stack: **Node.js + Express + Sequelize + MySQL (mysql2)**, validación con **express-validator**,
+autenticación **JWT + bcrypt**, logs con **morgan** y recarga automática con **nodemon**.
 
 ## Requisitos
 - Node.js 18 o superior
@@ -15,11 +15,8 @@ npm install
 copy .env.example .env        # Mac/Linux: cp .env.example .env
 # editar .env: poner DB_USER y DB_PASSWORD de tu MySQL
 npm run seed                  # crea tablas, el usuario admin y los 6 servicios
-npm run dev                   # http://localhost:3000  (nodemon + ts-node + morgan)
+npm run dev                   # http://localhost:3000  (nodemon + morgan)
 ```
-
-Scripts: `dev` (desarrollo con recarga), `build` (compila TypeScript a `dist/`), `start` (corre lo compilado, `node dist/server.js`),
-`seed` (datos iniciales) y `typecheck` (revisa tipos sin compilar).
 
 Comprobar: http://localhost:3000/api/salud -> `{"ok":true,...}`
 
@@ -31,21 +28,18 @@ Las credenciales se leen **solo** de `.env` (que está en `.gitignore`); en el r
 
 ```
 backend/src/
-├── config/        database.ts              (conexión Sequelize/MySQL desde .env)
-├── models/        Usuario, Cotizacion, Servicio, Contacto, Postulacion, Proyecto, index.ts (carga modelos y relaciones)
+├── config/        database.js              (conexión Sequelize/MySQL desde .env)
+├── models/        Usuario, Cotizacion, Servicio, Contacto, Postulacion, Proyecto, index.js (relaciones)
 ├── validators/    reglas de express-validator por módulo
-├── middlewares/   auth.ts, validar.ts, errorHandler.ts
+├── middlewares/   auth.js, validar.js, errorHandler.js
 ├── controllers/   lógica de cada módulo
 ├── routes/        endpoints de cada módulo
-├── utils/         crudFactory.ts, ApiError.ts, asyncHandler.ts
-├── types/         express.d.ts (agrega req.user al tipo Request)
-├── app.ts  server.ts  seed.ts
-
-backend/ tsconfig.json  nodemon.json  package.json  .env.example
+├── utils/         crudFactory.js, ApiError.js, asyncHandler.js
+├── app.js  server.js  seed.js
 ```
 
 Flujo de una petición: `ruta → auth/permisos → validators → validar (400) → controlador → modelo (Sequelize)`.
-Los errores terminan siempre en `errorHandler.ts`.
+Los errores terminan siempre en `errorHandler.js`.
 
 ## Modelo de datos
 
@@ -193,4 +187,4 @@ await fetch(`${API_URL}/api/postulaciones`, { method: 'POST', body: datos });
 - `Falta JWT_SECRET`: copiar `.env.example` a `.env`.
 
 ## Nota de estructura
-Además de `config/ models/ validators/ middlewares/ controllers/ routes/ utils/`, existe `src/seeds/` (`01-admin.seed.ts`, `02-servicios.seed.ts`, ejecutados en orden por `npm run seed`). Modelos y rutas (`*.routes.ts`) se cargan automáticamente, no hay que registrarlos a mano.
+Además de `config/ models/ validators/ middlewares/ controllers/ routes/ utils/`, existe `src/seeds/` (`01-admin.seed.js`, `02-servicios.seed.js`, ejecutados en orden por `npm run seed`). Modelos y rutas (`*.routes.js`) se cargan automáticamente, no hay que registrarlos a mano.
