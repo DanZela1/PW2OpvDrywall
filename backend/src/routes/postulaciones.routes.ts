@@ -165,6 +165,37 @@ router.post('/', subirCV, v.crear, validar, c.crear); // público (PB-09)
  *         description: No tiene permisos de administrador
  */
 router.get('/', auth, soloAdmin, v.listar, validar, c.listar);
+
+/**
+ * @swagger
+ * /postulaciones/{id}:
+ *   get:
+ *     summary: Obtener una postulación por ID (solo admin)
+ *     tags: [Postulaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Postulación encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Postulacion'
+ *       400:
+ *         description: ID inválido
+ *       401:
+ *         description: Token ausente o inválido
+ *       403:
+ *         description: No tiene permisos de administrador
+ *       404:
+ *         description: Postulación no encontrada
+ */
 router.get('/:id', auth, soloAdmin, v.id, validar, c.obtener);
 
 /**
@@ -251,6 +282,33 @@ router.get('/:id/cv', auth, soloAdmin, v.id, validar, c.descargarCV);
  *         description: Postulación no encontrada
  */
 router.patch('/:id/estado', auth, soloAdmin, v.estado, validar, c.cambiarEstado);
+
+/**
+ * @swagger
+ * /postulaciones/{id}:
+ *   delete:
+ *     summary: Eliminar una postulación (solo admin)
+ *     tags: [Postulaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Postulación eliminada correctamente
+ *       400:
+ *         description: ID inválido
+ *       401:
+ *         description: Token ausente o inválido
+ *       403:
+ *         description: No tiene permisos de administrador
+ *       404:
+ *         description: Postulación no encontrada
+ */
 router.delete('/:id', auth, soloAdmin, v.id, validar, c.eliminar);
 
 export default router;

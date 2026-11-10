@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import routes from './routes';
+import { setupSwagger } from './config/swagger';
 import { notFound, errorHandler } from './middlewares/errorHandler';
 import { CARPETA_IMAGENES } from './middlewares/subida';
 
