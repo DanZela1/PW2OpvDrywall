@@ -1,3 +1,6 @@
+// ============================================================
+// FORMULARIO DE REGISTRO
+// ============================================================
 body.body-reg {
     font-family: 'Poppins', sans-serif;
     color: @texto;
@@ -12,9 +15,7 @@ body.body-reg {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px 0;
-    box-sizing: border-box;
+    height: 100vh;
     font-family: 'Roboto', sans-serif;
     background-color: #f4f4f4;
 
@@ -32,10 +33,7 @@ body.body-reg {
 
     label { margin-bottom: 5px; font-weight: bold; }
 
-    input,
-    select,
-    textarea {
-        font-family: inherit;
+    input {
         margin-bottom: 5px;
         padding: 8px;
         border: 1px solid #ccc;
@@ -44,21 +42,7 @@ body.body-reg {
 
     .error { color: red; font-size: 12px; margin-bottom: 10px; display: none; }
 
-    textarea { resize: vertical; }
-
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .form-status {
-        margin: 10px 0 0;
-        font-size: 14px;
-        text-align: center;
-
-        &.status-ok { color: #1a7f37; }
-        &.status-error { color: #c62828; }
-        &.status-info { color: @texto-claro; }
-    }
-
-     button {
+    button {
         padding: 10px;
         background-color: #007bff;
         color: @blanco;
