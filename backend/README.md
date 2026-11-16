@@ -171,8 +171,6 @@ curl -X POST http://localhost:3000/api/servicios -H "Authorization: Bearer <toke
   -F "imagen=@/ruta/foto.jpg"
 ```
 
-En Postman: **Body → form-data**, los campos de texto como *Text* y `cv` / `imagen` cambiados a tipo *File*. No pongas el header `Content-Type` a mano.
-
 En el frontend, con `FormData` y **sin** poner `Content-Type` (el navegador agrega el boundary):
 
 ```ts
@@ -180,12 +178,12 @@ const datos = new FormData(formulario); // <input type="file" name="cv" accept="
 await fetch(`${API_URL}/api/postulaciones`, { method: 'POST', body: datos });
 ```
 
-## Pruebas con Postman
+## Documentación y pruebas con Swagger
 
-1. Importar `postman/OPV-Drywall-API.postman_collection.json`.
-2. Con el servidor corriendo y tras `npm run seed`, ejecutar la colección completa (Runner).
-3. Incluye 82 peticiones y 115 aserciones: CRUD de todos los módulos, validaciones 400, 401, 403, 404 y 409.
-   Se puede ejecutar varias veces seguidas.
+1. Con el servidor corriendo, abrir http://localhost:3000/api-docs
+2. Para las rutas protegidas: hacer `POST /api/auth/login` (tras `npm run seed`), copiar el `token`, pulsar **Authorize** y pegarlo.
+3. Probar cada endpoint con **Try it out**: CRUD de todos los módulos y respuestas 400, 401, 403, 404 y 409.
+4. La subida de archivos (`cv`, `imagen`) se prueba con los ejemplos `curl` de arriba.
 
 ## Problemas comunes
 - `ECONNREFUSED`: MySQL no está encendido o `DB_HOST`/`DB_PORT` son incorrectos.
