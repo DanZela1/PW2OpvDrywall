@@ -20,7 +20,16 @@ async function iniciar(): Promise<void> {
     await sequelize.sync(); // crea las tablas si no existen
     await asegurarColumnas(); // agrega columnas de archivos a bases ya creadas
     console.log(`Conectado a MySQL (${process.env.DB_NAME || 'opv_drywall'})`);
-    app.listen(PORT, () => console.log(`API corriendo en http://localhost:${PORT}`));
+    const servidor = app.listen(PORT, () => console.log(`API corriendo en http://localhost:${PORT}`));
+    servidor.on('error', (error: NodeJS.ErrnoException) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`El puerto ${PORT} ya está en uso por otro programa.`);
+        console.error('-> Cierra el otro programa o cambia PORT en backend/.env');
+      } else {
+        console.error('Error del servidor:', error.message);
+      }
+      process.exit(1);
+    });
   } catch (err) {
     const error = err as NodeJS.ErrnoException & { message: string };
     console.error('No se pudo iniciar el servidor:', error.message);

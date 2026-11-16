@@ -43,6 +43,7 @@ export default defineConfig(({ command }) => ({
 
   server: {
     port: 5173,
+    strictPort: true, // si 5173 está ocupado, falla en vez de cambiar de puerto (el CORS de la API espera 5173)
   },
 
   plugins: [
