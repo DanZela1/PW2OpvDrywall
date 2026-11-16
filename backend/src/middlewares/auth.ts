@@ -1,37 +1,50 @@
-import { Request, RequestHandler } from 'express';
-import jwt from 'jsonwebtoken';
+import { RequestHandler } from 'express';
+import passport from 'passport';
+import ApiError from '../utils/ApiError';
 
-const leerToken = (req: Request): string | undefined => req.headers.authorization?.split(' ')[1];
+type Rol = Express.User['rol'];
 
-type DatosToken = { id: number; rol: 'admin' | 'cliente' };
+/**
+ * Autentica con la estrategia JWT de Passport.
+ * - obligatorio = true : sin token válido responde 401 con un mensaje claro
+ * - obligatorio = false: si el token falta o es inválido, sigue como visitante (cotización pública)
+ */
+const autenticar =
+  (obligatorio: boolean): RequestHandler =>
+  (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (error: unknown, usuario: Express.User | false, info: unknown) => {
+      if (error) return next(error);
+      if (usuario) {
+        req.user = usuario;
+        return next();
+      }
+      if (!obligatorio) return next();
 
-// Exige un token válido; sin token o con token vencido responde 401
-export const auth: RequestHandler = (req, res, next) => {
-  const token = leerToken(req);
-  if (!token) return res.status(401).json({ error: 'No autenticado' });
-  try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET as string) as DatosToken;
-    next();
-  } catch {
-    res.status(401).json({ error: 'Token inválido o expirado' });
-  }
-};
+      // `info` trae el motivo por el que falló la verificación del token
+      const motivo = info instanceof Error ? info : undefined;
+      res.set('WWW-Authenticate', 'Bearer');
+      if (motivo?.name === 'TokenExpiredError') {
+        return next(new ApiError(401, 'Tu sesión expiró, inicia sesión de nuevo'));
+      }
+      if (motivo?.message === 'No auth token') {
+        return next(new ApiError(401, 'No autenticado: falta el token (Authorization: Bearer <token>)'));
+      }
+      return next(new ApiError(401, 'Token inválido'));
+    })(req, res, next);
+  };
 
-// Lee el token si viene, pero deja pasar a los visitantes (cotización pública)
-export const authOpcional: RequestHandler = (req, res, next) => {
-  const token = leerToken(req);
-  if (token) {
-    try {
-      req.user = jwt.verify(token, process.env.JWT_SECRET as string) as DatosToken;
-    } catch {
-      /* token inválido: se trata como visitante */
-    }
-  }
-  next();
-};
+// Exige un token válido: sin token, vencido o inválido responde 401
+export const auth: RequestHandler = autenticar(true);
 
-// Solo deja pasar al rol admin; si no, responde 403
-export const soloAdmin: RequestHandler = (req, res, next) => {
-  if (req.user?.rol === 'admin') return next();
-  res.status(403).json({ error: 'No tienes permiso para esta acción' });
-};
+// Lee el token si viene, pero deja pasar a los visitantes
+export const authOpcional: RequestHandler = autenticar(false);
+
+// Deja pasar solo a los roles indicados; a los demás les responde 403 (ya autenticados, sin permiso)
+export const permitirRoles =
+  (...roles: Rol[]): RequestHandler =>
+  (req, _res, next) => {
+    if (req.user && roles.includes(req.user.rol)) return next();
+    next(new ApiError(403, 'No tienes permiso para esta acción'));
+  };
+
+export const soloAdmin: RequestHandler = permitirRoles('admin');

@@ -12,6 +12,7 @@ const aplicarHash = async (_req: Request, { password, ...resto }: Record<string,
 
 export default crearCrud(Usuario, {
   nombre: 'Usuario',
+  camposBusqueda: ['nombre', 'correo'],
   antesDeCrear: aplicarHash,
   antesDeActualizar: aplicarHash,
   antesDeEliminar: async (req, usuario) => {

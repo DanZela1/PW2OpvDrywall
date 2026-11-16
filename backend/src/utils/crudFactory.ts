@@ -1,6 +1,6 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler } from 'express';
 import { matchedData } from 'express-validator';
-import { Includeable, Model, ModelStatic, Order } from 'sequelize';
+import { FindAttributeOptions, Includeable, Model, ModelStatic, Op, Order, WhereOptions } from 'sequelize';
 import ApiError from './ApiError';
 import h from './asyncHandler';
 
@@ -10,6 +10,12 @@ export interface OpcionesCrud {
   nombre: string;
   include?: Includeable[];
   orden?: Order;
+  /** Columnas donde busca el parámetro ?q= (búsqueda por texto parcial) */
+  camposBusqueda?: string[];
+  /** Condición que se agrega SIEMPRE al listar y al consultar (ej. a los visitantes solo se les muestran los activos) */
+  filtroBase?: (req: Request) => WhereOptions;
+  /** Columnas que se devuelven (ej. ocultar el correo a los visitantes) */
+  atributos?: (req: Request) => FindAttributeOptions | undefined;
   antesDeCrear?: (req: Parameters<RequestHandler>[0], datos: Datos) => Promise<Datos> | Datos;
   antesDeActualizar?: (req: Parameters<RequestHandler>[0], datos: Datos, registro: Model) => Promise<Datos> | Datos;
   antesDeEliminar?: (req: Parameters<RequestHandler>[0], registro: Model & Datos) => Promise<void> | void;
@@ -19,13 +25,30 @@ export interface OpcionesCrud {
  * Genera las 5 operaciones CRUD de un modelo.
  * Solo se guardan los campos que pasaron express-validator (matchedData),
  * así que ningún campo no validado llega a la base de datos.
+ *
+ * El listado entiende: pagina, limite, q (búsqueda), desde / hasta (fecha de creación),
+ * ordenarPor / dir (orden) y cualquier filtro por columna que el validator haya aprobado.
  */
 export default function crearCrud(
   Modelo: ModelStatic<any>,
-  { nombre, include = [], orden = [['id', 'DESC']], antesDeCrear, antesDeActualizar, antesDeEliminar }: OpcionesCrud,
+  {
+    nombre,
+    include = [],
+    orden = [['id', 'DESC']],
+    camposBusqueda = [],
+    filtroBase,
+    atributos,
+    antesDeCrear,
+    antesDeActualizar,
+    antesDeEliminar,
+  }: OpcionesCrud,
 ) {
-  const buscar = async (id: number | string) => {
-    const registro = await Modelo.findByPk(id, { include });
+  const buscar = async (id: number | string, req?: Request) => {
+    const registro = await Modelo.findOne({
+      where: { id, ...(req && filtroBase ? filtroBase(req) : {}) },
+      include,
+      attributes: req && atributos ? atributos(req) : undefined,
+    });
     if (!registro) throw new ApiError(404, `No se encontró ${nombre.toLowerCase()} con id ${id}`);
     return registro;
   };
@@ -34,11 +57,24 @@ export default function crearCrud(
     buscar,
 
     listar: h(async (req, res) => {
-      const { pagina = 1, limite = 20, ...filtros } = matchedData(req, { locations: ['query'] });
+      const { pagina = 1, limite = 20, q, desde, hasta, ordenarPor, dir, ...filtros } = matchedData(req, {
+        locations: ['query'],
+      });
+
+      const where: Record<string | symbol, unknown> = { ...filtros, ...(filtroBase ? filtroBase(req) : {}) };
+
+      if (q && camposBusqueda.length) {
+        where[Op.or] = camposBusqueda.map((campo) => ({ [campo]: { [Op.like]: `%${q}%` } }));
+      }
+      if (desde || hasta) {
+        where.createdAt = { ...(desde && { [Op.gte]: desde }), ...(hasta && { [Op.lte]: hasta }) };
+      }
+
       const { rows, count } = await Modelo.findAndCountAll({
-        where: filtros,
+        where: where as WhereOptions,
         include,
-        order: orden,
+        attributes: atributos ? atributos(req) : undefined,
+        order: ordenarPor ? [[ordenarPor, (dir || 'asc').toUpperCase()], ['id', 'DESC']] : orden,
         limit: limite,
         offset: (pagina - 1) * limite,
         distinct: true,
@@ -47,7 +83,7 @@ export default function crearCrud(
     }),
 
     obtener: h(async (req, res) => {
-      res.json(await buscar(req.params.id));
+      res.json(await buscar(req.params.id, req));
     }),
 
     crear: h(async (req, res) => {

@@ -119,4 +119,4 @@ PR1 (Melissa, base) → PR2 (Saúl, auth/usuarios) → PR3, PR4 y PR5 (Stefanny,
 
 ## Nota: el backend está en TypeScript
 
-Para correr todo: `npm install` y `npm start` en la raíz (instala lo que falte y levanta sitio :5173, API :3000 y órdenes :3001). Todo el código de `backend/src` está en TypeScript (`.ts`). `npm run dev` usa nodemon con ts-node, `npm run build` compila a `dist/` y `npm start` corre lo compilado. Antes de abrir un PR, además de probar en Swagger, ejecutar `npm run typecheck` para confirmar que no hay errores de tipos.
+Para correr todo: `npm install` y `npm start` en la raíz (instala lo que falte y levanta sitio :5173, API :3000 y app React :5174). Todo el código de `backend/src` está en TypeScript (`.ts`). `npm run dev` usa nodemon con ts-node, `npm run build` compila a `dist/` y `npm start` corre lo compilado. Antes de abrir un PR, además de probar en Swagger, ejecutar `npm run typecheck` para confirmar que no hay errores de tipos.

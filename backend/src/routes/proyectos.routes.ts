@@ -3,6 +3,7 @@ import c from '../controllers/proyecto.controller';
 import * as v from '../validators/proyecto.validator';
 import validar from '../middlewares/validar';
 import { auth, soloAdmin } from '../middlewares/auth';
+import { limitePublico } from '../middlewares/limitador';
 
 const router = Router();
 
@@ -26,7 +27,7 @@ const router = Router();
  *         codigo:
  *           type: string
  *           maxLength: 20
- *           example: PRY-0001
+ *           example: OPV-2026-0001
  *         clienteCorreo:
  *           type: string
  *           format: email
@@ -72,20 +73,36 @@ const router = Router();
  *               codigo:
  *                 type: string
  *                 maxLength: 20
- *                 example: PRY-0001
+ *                 example: OPV-2026-0001
  *     responses:
  *       200:
- *         description: Proyecto encontrado
+ *         description: Proyecto encontrado (solo datos de seguimiento, sin información interna)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Proyecto'
+ *               type: object
+ *               properties:
+ *                 codigo:
+ *                   type: string
+ *                   example: OPV-2026-0001
+ *                 estado:
+ *                   type: string
+ *                   enum: [Cotización enviada, En ejecución, Finalizado]
+ *                   example: En ejecución
+ *                 ultimaActualizacion:
+ *                   type: string
+ *                   format: date-time
+ *                 contacto:
+ *                   type: string
+ *                   example: opvdrywall@gmail.com
  *       400:
  *         description: Datos inválidos
  *       404:
  *         description: No existe un proyecto con ese correo y código
+ *       429:
+ *         description: Demasiadas consultas desde la misma IP
  */
-router.post('/consulta', v.consulta, validar, c.consultar); // público (PB-07)
+router.post('/consulta', limitePublico, v.consulta, validar, c.consultar); // público (PB-07)
 
 /**
  * @swagger
@@ -106,6 +123,15 @@ router.post('/consulta', v.consulta, validar, c.consultar); // público (PB-07)
  *         schema:
  *           type: integer
  *           default: 20
+ *       - $ref: '#/components/parameters/Busqueda'
+ *       - $ref: '#/components/parameters/Desde'
+ *       - $ref: '#/components/parameters/Hasta'
+ *       - in: query
+ *         name: ordenarPor
+ *         schema:
+ *           type: string
+ *           enum: [id, createdAt, codigo, estado]
+ *       - $ref: '#/components/parameters/Dir'
  *       - in: query
  *         name: estado
  *         schema:

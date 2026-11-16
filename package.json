@@ -12,11 +12,11 @@
     "setup": "tsx scripts/setup.ts",
     "start": "npm run dev:all",
     "predev:all": "tsx scripts/setup.ts --solo-faltantes",
-    "dev:all": "concurrently -k -n sitio,api,ordenes -c cyan,green,magenta \"npm run dev\" \"cross-env PORT=3000 npm run dev --prefix backend\" \"cross-env PORT=3001 npm run dev --prefix transac_crud\"",
+    "dev:all": "concurrently -k -n sitio,api,app -c cyan,green,magenta \"npm run dev\" \"cross-env PORT=3000 npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "predev:api": "tsx scripts/setup.ts --solo-faltantes",
     "dev:api": "concurrently -k -n sitio,api -c cyan,green \"npm run dev\" \"cross-env PORT=3000 npm run dev --prefix backend\"",
-    "typecheck:all": "npm run typecheck && npm run typecheck --prefix backend && npm run typecheck --prefix transac_crud",
-    "build:all": "npm run build && npm run build --prefix backend && npm run build --prefix transac_crud"
+    "typecheck:all": "npm run typecheck && npm run typecheck --prefix backend && npm run typecheck --prefix frontend",
+    "build:all": "npm run build && npm run build --prefix backend && npm run build --prefix frontend"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

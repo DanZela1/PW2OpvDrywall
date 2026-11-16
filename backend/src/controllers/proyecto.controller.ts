@@ -8,6 +8,7 @@ const { Proyecto, Cotizacion } = models;
 
 const crud = crearCrud(Proyecto, {
   nombre: 'Proyecto',
+  camposBusqueda: ['codigo', 'clienteCorreo'],
   include: [{ model: Cotizacion, as: 'cotizacion', attributes: ['id', 'nombre', 'tipoServicio', 'estado'] }],
   antesDeCrear: async (_req, datos) => {
     // Código de seguimiento OPV-AÑO-NNNN, siempre generado por el sistema

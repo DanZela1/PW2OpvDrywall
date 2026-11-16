@@ -1,4 +1,4 @@
-import { id as idRegla, paginacion, texto, correo, enumerado, alMenosUnCampo, body, query } from './comunes';
+import { id as idRegla, paginacion, busqueda, ordenable, texto, correo, enumerado, alMenosUnCampo, body, query } from './comunes';
 import { ESTADOS } from '../models/Proyecto';
 import models from '../models';
 
@@ -14,6 +14,8 @@ const cotizacionExiste = body('cotizacionId')
 export const id = idRegla;
 export const listar = [
   ...paginacion,
+  ...busqueda,
+  ...ordenable(['id', 'createdAt', 'codigo', 'estado']),
   query('estado').optional().isIn(ESTADOS).withMessage(`estado debe ser uno de: ${ESTADOS.join(', ')}`),
 ];
 export const crear = [

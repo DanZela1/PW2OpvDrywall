@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const SUBPROYECTOS = ['backend', 'transac_crud'];
+const SUBPROYECTOS = ['backend', 'frontend'];
 const RAIZ = process.cwd();
 const SOLO_FALTANTES = process.argv.includes('--solo-faltantes');
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';

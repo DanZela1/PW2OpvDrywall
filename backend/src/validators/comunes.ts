@@ -13,6 +13,22 @@ export const paginacion: ValidationChain[] = [
   query('limite').optional().isInt({ min: 1, max: 100 }).withMessage('limite debe estar entre 1 y 100').toInt(),
 ];
 
+// Búsqueda, rango de fechas y orden de los listados (se combinan con `paginacion`)
+export const busqueda: ValidationChain[] = [
+  query('q').optional().isString().trim().isLength({ min: 1, max: 100 }).withMessage('q debe tener entre 1 y 100 caracteres'),
+  query('desde').optional().isISO8601().withMessage('desde debe ser una fecha válida (AAAA-MM-DD)').toDate(),
+  query('hasta').optional().isISO8601().withMessage('hasta debe ser una fecha válida (AAAA-MM-DD)')
+    // si solo viene la fecha (AAAA-MM-DD), incluye todo ese día
+    .customSanitizer((v: string) => (/^\d{4}-\d{2}-\d{2}$/.test(v) ? `${v}T23:59:59.999Z` : v))
+    .toDate(),
+];
+
+// Orden: solo se aceptan las columnas de la lista, así nadie puede ordenar por campos internos
+export const ordenable = (campos: readonly string[]): ValidationChain[] => [
+  query('ordenarPor').optional().isIn(campos).withMessage(`ordenarPor debe ser uno de: ${campos.join(', ')}`),
+  query('dir').optional().toLowerCase().isIn(['asc', 'desc']).withMessage('dir debe ser asc o desc'),
+];
+
 // Campo obligatorio (debe existir) u opcional (solo se valida si viene)
 const inicio = (campo: string, requerido: boolean): ValidationChain =>
   requerido
@@ -39,6 +55,23 @@ export const telefono = (campo = 'telefono', { requerido = true }: Opciones = {}
 
 export const enumerado = (campo: string, valores: readonly string[], { requerido = true }: Opciones = {}): ValidationChain =>
   inicio(campo, requerido).isIn(valores).withMessage(`${campo} debe ser uno de: ${valores.join(', ')}`);
+
+// Número decimal (precios y cantidades). `nullable` permite enviar null para vaciar el campo.
+export const numero = (
+  campo: string,
+  { min = 0, max = 99999999, requerido = true, nullable = false }: { min?: number; max?: number; requerido?: boolean; nullable?: boolean } = {},
+): ValidationChain => {
+  const base = requerido ? body(campo).exists({ values: nullable ? 'undefined' : 'null' }).withMessage(`${campo} es obligatorio`).bail() : body(campo).optional({ nullable });
+  return base
+    .isFloat({ min, max }).withMessage(`${campo} debe ser un número entre ${min} y ${max}`)
+    .toFloat();
+};
+
+// Entero positivo que apunta a un registro de otra tabla (categoriaId, proyectoId...)
+export const referencia = (campo: string, { requerido = false, nullable = false }: { requerido?: boolean; nullable?: boolean } = {}): ValidationChain => {
+  const base = requerido ? body(campo).exists({ values: 'null' }).withMessage(`${campo} es obligatorio`).bail() : body(campo).optional({ nullable });
+  return base.isInt({ min: 1 }).withMessage(`${campo} debe ser un entero positivo`).toInt();
+};
 
 export const booleano = (campo: string, { requerido = false }: Opciones = {}): ValidationChain =>
   inicio(campo, requerido).isBoolean().withMessage(`${campo} debe ser true o false`).toBoolean();
