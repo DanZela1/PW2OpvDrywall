@@ -19,9 +19,11 @@ const RAIZ = process.env.UPLOADS_DIR
   : path.join(__dirname, '..', '..', 'uploads');
 
 export const CARPETA_IMAGENES = path.join(RAIZ, 'imagenes'); // pública: se sirve en /uploads/imagenes
+export const CARPETA_TESTIMONIOS = path.join(RAIZ, 'testimonios'); // pública: se sirve en /uploads/testimonios
 export const CARPETA_CV = path.join(RAIZ, 'cv'); // privada: solo la descarga un admin con token
 
-[CARPETA_IMAGENES, CARPETA_CV].forEach((c) => fs.mkdirSync(c, { recursive: true }));
+// Una carpeta por tipo de archivo: así el almacenamiento queda ordenado y se pueden respaldar por separado
+[CARPETA_IMAGENES, CARPETA_TESTIMONIOS, CARPETA_CV].forEach((c) => fs.mkdirSync(c, { recursive: true }));
 
 // ---------------------------------------------------------------------------
 // Tipos permitidos. Además del mimetype que declara el cliente (que puede mentir)
@@ -117,6 +119,7 @@ const crearSubida = (campo: string, carpeta: string, permitidos: string[]): Requ
 
 export const subirImagen = crearSubida('imagen', CARPETA_IMAGENES, MIME_IMAGENES);
 export const subirCV = crearSubida('cv', CARPETA_CV, MIME_DOCUMENTOS);
+export const subirFotoTestimonio = crearSubida('foto', CARPETA_TESTIMONIOS, MIME_IMAGENES);
 
 // ---------------------------------------------------------------------------
 // Helpers para controladores
@@ -127,6 +130,14 @@ export const rutaPublicaImagen = (archivo: Express.Multer.File) => `/uploads/ima
 /** Borra una imagen a partir de la ruta pública guardada en la base de datos */
 export const borrarImagen = (rutaPublica?: string | null) => {
   if (rutaPublica) borrar(path.join(CARPETA_IMAGENES, path.basename(rutaPublica)));
+};
+
+/** Ruta pública de la foto de un testimonio, ej. /uploads/testimonios/1793-ab12.jpg */
+export const rutaPublicaFoto = (archivo: Express.Multer.File) => `/uploads/testimonios/${archivo.filename}`;
+
+/** Borra la foto de un testimonio a partir de la ruta pública guardada en la base de datos */
+export const borrarFoto = (rutaPublica?: string | null) => {
+  if (rutaPublica) borrar(path.join(CARPETA_TESTIMONIOS, path.basename(rutaPublica)));
 };
 
 /** Borra un CV a partir del nombre de archivo guardado en la base de datos */

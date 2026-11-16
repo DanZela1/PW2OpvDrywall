@@ -3,6 +3,7 @@ import c from '../controllers/contacto.controller';
 import * as v from '../validators/contacto.validator';
 import validar from '../middlewares/validar';
 import { auth, soloAdmin } from '../middlewares/auth';
+import { limitePublico } from '../middlewares/limitador';
 
 const router = Router();
 
@@ -78,8 +79,10 @@ const router = Router();
  *               $ref: '#/components/schemas/Contacto'
  *       400:
  *         description: Datos inválidos
+ *       429:
+ *         description: Demasiadas solicitudes desde la misma IP
  */
-router.post('/', v.crear, validar, c.crear); // público
+router.post('/', limitePublico, v.crear, validar, c.crear); // público
 
 /**
  * @swagger
@@ -100,6 +103,15 @@ router.post('/', v.crear, validar, c.crear); // público
  *         schema:
  *           type: integer
  *           default: 20
+ *       - $ref: '#/components/parameters/Busqueda'
+ *       - $ref: '#/components/parameters/Desde'
+ *       - $ref: '#/components/parameters/Hasta'
+ *       - in: query
+ *         name: ordenarPor
+ *         schema:
+ *           type: string
+ *           enum: [id, createdAt, nombre, leido]
+ *       - $ref: '#/components/parameters/Dir'
  *       - in: query
  *         name: leido
  *         schema:

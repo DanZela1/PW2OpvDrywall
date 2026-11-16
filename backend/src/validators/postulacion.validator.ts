@@ -1,9 +1,11 @@
-import { id as idRegla, paginacion, texto, correo, telefono, enumerado, alMenosUnCampo, query } from './comunes';
+import { id as idRegla, paginacion, busqueda, ordenable, texto, correo, telefono, enumerado, alMenosUnCampo, query } from './comunes';
 import { ESTADOS } from '../models/Postulacion';
 
 export const id = idRegla;
 export const listar = [
   ...paginacion,
+  ...busqueda,
+  ...ordenable(['id', 'createdAt', 'nombre', 'estado']),
   query('estado').optional().isIn(ESTADOS).withMessage(`estado debe ser uno de: ${ESTADOS.join(', ')}`),
 ];
 export const crear = [texto('nombre'), correo(), telefono(), texto('experiencia', { max: 1000, requerido: false })];

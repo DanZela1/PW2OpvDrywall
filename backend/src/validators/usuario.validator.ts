@@ -1,5 +1,5 @@
 import { ValidationChain } from 'express-validator';
-import { id as idRegla, paginacion, texto, correo, enumerado, alMenosUnCampo, body, query } from './comunes';
+import { id as idRegla, paginacion, busqueda, ordenable, texto, correo, enumerado, alMenosUnCampo, body, query } from './comunes';
 
 const ROLES = ['admin', 'cliente'];
 
@@ -13,7 +13,7 @@ const password = (requerido: boolean): ValidationChain => {
 };
 
 export const id = idRegla;
-export const listar = [...paginacion, query('rol').optional().isIn(ROLES).withMessage(`rol debe ser uno de: ${ROLES.join(', ')}`)];
+export const listar = [...paginacion, ...busqueda, ...ordenable(['id', 'createdAt', 'nombre', 'correo', 'rol']), query('rol').optional().isIn(ROLES).withMessage(`rol debe ser uno de: ${ROLES.join(', ')}`)];
 export const crear = [texto('nombre'), correo(), password(true), enumerado('rol', ROLES, { requerido: false })];
 export const actualizar = [
   ...idRegla, alMenosUnCampo,

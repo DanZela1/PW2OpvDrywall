@@ -34,6 +34,15 @@ router.use(auth, soloAdmin); // todo el módulo es solo para administradores
  *         schema:
  *           type: integer
  *           default: 20
+ *       - $ref: '#/components/parameters/Busqueda'
+ *       - $ref: '#/components/parameters/Desde'
+ *       - $ref: '#/components/parameters/Hasta'
+ *       - in: query
+ *         name: ordenarPor
+ *         schema:
+ *           type: string
+ *           enum: [id, createdAt, nombre, correo, rol]
+ *       - $ref: '#/components/parameters/Dir'
  *       - in: query
  *         name: rol
  *         schema:

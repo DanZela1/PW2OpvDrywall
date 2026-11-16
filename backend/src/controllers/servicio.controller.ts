@@ -6,6 +6,9 @@ const { Servicio } = models;
 
 export default crearCrud(Servicio, {
   nombre: 'Servicio',
+  camposBusqueda: ['nombre', 'descripcion'],
+  // El precio base es interno: solo lo ve un administrador
+  atributos: (req) => (req.user?.rol === 'admin' ? undefined : { exclude: ['precioBase'] }),
   // Guarda qué administrador creó el servicio y, si se envió, la ruta de su imagen
   antesDeCrear: async (req, datos) => ({
     ...datos,

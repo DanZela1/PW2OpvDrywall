@@ -9,11 +9,12 @@ export interface ServicioAtributos {
   categoria: string;
   contacto: string | null;
   imagen: string | null; // ruta pública, ej. /uploads/imagenes/123-ab.jpg
+  precioBase: number | null; // precio de referencia para cotizar (solo lo ve el admin)
   activo: boolean;
   usuarioId?: number | null; // la agrega la relación con Usuario
 }
 
-type ServicioCreacion = Optional<ServicioAtributos, 'id' | 'contacto' | 'imagen' | 'activo' | 'usuarioId'>;
+type ServicioCreacion = Optional<ServicioAtributos, 'id' | 'contacto' | 'imagen' | 'precioBase' | 'activo' | 'usuarioId'>;
 
 export interface ServicioInstancia extends Model<ServicioAtributos, ServicioCreacion>, ServicioAtributos {}
 
@@ -26,6 +27,14 @@ const Servicio = sequelize.define<ServicioInstancia>(
     categoria: { type: DataTypes.STRING(60), allowNull: false },
     contacto: { type: DataTypes.STRING(120), allowNull: true },
     imagen: { type: DataTypes.STRING(255), allowNull: true },
+    precioBase: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      get(this: ServicioInstancia) {
+        const v = this.getDataValue('precioBase') as unknown;
+        return v === null || v === undefined ? null : Number(v);
+      },
+    },
     activo: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   },
   { tableName: 'servicios' },
