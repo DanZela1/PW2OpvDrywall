@@ -11,6 +11,7 @@ const { Postulacion } = models;
 
 const crud = crearCrud(Postulacion, {
   nombre: 'Postulación',
+  camposBusqueda: ['nombre', 'correo', 'telefono'],
   // Guarda el nombre del CV subido (el archivo queda en uploads/cv, que no es público)
   antesDeCrear: (req, datos) => ({ ...datos, ...(req.file && { cv: req.file.filename }) }),
   // Si llega un CV nuevo, reemplaza (y borra) el anterior

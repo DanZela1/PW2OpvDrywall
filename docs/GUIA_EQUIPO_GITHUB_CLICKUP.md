@@ -64,7 +64,7 @@ Luego abrir el Pull Request en GitHub (la plantilla se llena sola) y mover la ta
 Tipos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`.
 
 - `feat(auth): agrega login con JWT y bcrypt (CU-86abc124)`
-- `test(postman): agrega pruebas de permisos 401/403 de cotizaciones (CU-86abc130)`
+- `docs(swagger): documenta permisos 401/403 de cotizaciones (CU-86abc130)`
 - `fix(validaciones): corrige regex de teléfono (CU-86abc131)`
 
 **Revisión:** otro integrante (y Fabricio) revisa cada PR antes del merge. El merge lo hace quien abrió el PR, tras la aprobación.
@@ -79,7 +79,7 @@ Los módulos dependen de una base común. Cada PR debe dejar el servidor arranca
 3. **PR 3 a 6 en paralelo** (Stefanny, Freed, Gustavo, Kenneth): cada uno agrega los archivos de su módulo.
 4. Cada módulo agrega **sus propias líneas** en los archivos compartidos `models/index.ts` y `routes/index.ts`
    (por eso esos dos archivos se tocan con cuidado y se hace `git pull` antes).
-5. Al final, Kenneth integra el README y se ejecuta la colección completa de Postman.
+5. Al final, Kenneth integra el README y se revisan todos los endpoints en Swagger.
 
 Archivos de cada módulo (para no pisarse):
 
@@ -106,7 +106,7 @@ El repositorio es **público** (necesario para GitHub Pages gratis). No subir n�
 - [ ] Hay ramas por tarea y Pull Requests; ningún commit directo a `main`
 - [ ] El título del PR y los commits mencionan el ID de ClickUp (`CU-...`)
 - [ ] `npm run dev` arranca, conecta a MySQL y morgan muestra las peticiones
-- [ ] Colección de Postman exportada en `backend/postman/` y capturas de la ejecución
+- [ ] Capturas de Swagger (`/api-docs`) con los endpoints probados
 
 ## Orden de integración de los Pull Requests (backend por etapas)
 
@@ -119,4 +119,4 @@ PR1 (Melissa, base) → PR2 (Saúl, auth/usuarios) → PR3, PR4 y PR5 (Stefanny,
 
 ## Nota: el backend está en TypeScript
 
-Todo el código de `backend/src` está en TypeScript (`.ts`). `npm run dev` usa nodemon con ts-node, `npm run build` compila a `dist/` y `npm start` corre lo compilado. Antes de abrir un PR, además de probar con Postman, ejecutar `npm run typecheck` para confirmar que no hay errores de tipos.
+Para correr todo: `npm install` y `npm start` en la raíz (instala lo que falte y levanta sitio :5173, API :3000 y app React :5174). Todo el código de `backend/src` está en TypeScript (`.ts`). `npm run dev` usa nodemon con ts-node, `npm run build` compila a `dist/` y `npm start` corre lo compilado. Antes de abrir un PR, además de probar en Swagger, ejecutar `npm run typecheck` para confirmar que no hay errores de tipos.

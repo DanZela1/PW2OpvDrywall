@@ -4,6 +4,34 @@ import { Router } from 'express';
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Sistema
+ *   description: Estado del servicio
+ */
+
+/**
+ * @swagger
+ * /salud:
+ *   get:
+ *     summary: Comprobar que la API está funcionando
+ *     tags: [Sistema]
+ *     responses:
+ *       200:
+ *         description: La API responde
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
+ *                 servicio:
+ *                   type: string
+ *                   example: OPV Drywall API
+ */
 router.get('/salud', (_req, res) => {
   res.json({ ok: true, servicio: 'OPV Drywall API' });
 });

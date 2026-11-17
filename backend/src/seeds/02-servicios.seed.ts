@@ -1,22 +1,25 @@
 import type { Modelos } from '../models';
 
-const SERVICIOS: Array<[string, string, string]> = [
-  ['Estructura Residencial', 'Estructuras de drywall para viviendas', 'Construcción'],
-  ['Estructura Comercial', 'Estructuras de drywall para locales y oficinas', 'Construcción'],
-  ['Aislamiento', 'Aislamiento térmico y acústico', 'Acabados'],
-  ['Paneles de Yeso', 'Instalación de paneles de yeso', 'Construcción'],
-  ['Revestimiento de Paredes', 'Revestimiento y acabado de paredes', 'Acabados'],
-  ['Techado', 'Instalación de cielos y techos', 'Construcción'],
+// [nombre, descripción, categoría, precio base de EJEMPLO por m² en lempiras: el equipo debe ajustarlo a sus precios reales]
+const SERVICIOS: Array<[string, string, string, number]> = [
+  ['Estructura Residencial', 'Estructuras de drywall para viviendas', 'Construcción', 250],
+  ['Estructura Comercial', 'Estructuras de drywall para locales y oficinas', 'Construcción', 280],
+  ['Aislamiento', 'Aislamiento térmico y acústico', 'Acabados', 120],
+  ['Paneles de Yeso', 'Instalación de paneles de yeso', 'Construcción', 180],
+  ['Revestimiento de Paredes', 'Revestimiento y acabado de paredes', 'Acabados', 150],
+  ['Techado', 'Instalación de cielos y techos', 'Construcción', 220],
 ];
 
-// Carga los 6 servicios iniciales; se puede ejecutar varias veces sin duplicar (findOrCreate)
+// Carga los 6 servicios iniciales; se puede ejecutar varias veces sin duplicar (findOrCreate).
+// Si un servicio ya existía sin precio base, se le pone el de ejemplo (nunca pisa un precio ya definido).
 export default async ({ Usuario, Servicio }: Modelos): Promise<string> => {
-  const admin = await Usuario.findOne({ where: { correo: 'admin@opvdrywall.com' } });
-  for (const [nombre, descripcion, categoria] of SERVICIOS) {
-    await Servicio.findOrCreate({
+  const admin = await Usuario.findOne({ where: { rol: 'admin' }, order: [['id', 'ASC']] });
+  for (const [nombre, descripcion, categoria, precioBase] of SERVICIOS) {
+    const [servicio] = await Servicio.findOrCreate({
       where: { nombre },
-      defaults: { descripcion, categoria, usuarioId: admin?.id ?? null },
+      defaults: { descripcion, categoria, precioBase, usuarioId: admin?.id ?? null },
     });
+    if (servicio.precioBase === null) await servicio.update({ precioBase });
   }
-  return `Servicios cargados: ${SERVICIOS.length}`;
+  return `Servicios cargados: ${SERVICIOS.length} (precios base de ejemplo)`;
 };

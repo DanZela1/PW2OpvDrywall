@@ -4,6 +4,7 @@ import * as v from '../validators/postulacion.validator';
 import validar from '../middlewares/validar';
 import { auth, soloAdmin } from '../middlewares/auth';
 import { subirCV } from '../middlewares/subida';
+import { limitePublico } from '../middlewares/limitador';
 
 const router = Router();
 
@@ -71,6 +72,10 @@ const router = Router();
  *         estado:
  *           type: string
  *           enum: [nueva, revisada, aceptada, rechazada]
+ *         cv:
+ *           type: string
+ *           format: binary
+ *           description: CV en PDF, DOC o DOCX (máximo 5 MB). Solo se envía en multipart/form-data
  */
 
 /**
@@ -102,6 +107,29 @@ const router = Router();
  *                 type: string
  *                 maxLength: 1000
  *                 example: 3 años instalando paneles de yeso.
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [nombre, correo, telefono]
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 example: Mario Reyes
+ *               correo:
+ *                 type: string
+ *                 format: email
+ *                 example: mario@mail.com
+ *               telefono:
+ *                 type: string
+ *                 maxLength: 10
+ *                 example: "98765432"
+ *               experiencia:
+ *                 type: string
+ *                 maxLength: 1000
+ *               cv:
+ *                 type: string
+ *                 format: binary
+ *                 description: CV en PDF, DOC o DOCX (máximo 5 MB)
  *     responses:
  *       201:
  *         description: Postulación registrada
@@ -110,9 +138,13 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Postulacion'
  *       400:
- *         description: Datos inválidos
+ *         description: Datos inválidos o tipo de archivo no permitido
+ *       413:
+ *         description: El CV supera el tamaño máximo
+ *       429:
+ *         description: Demasiadas solicitudes desde la misma IP
  */
-router.post('/', subirCV, v.crear, validar, c.crear); // público (PB-09)
+router.post('/', limitePublico, subirCV, v.crear, validar, c.crear); // público (PB-09)
 
 /**
  * @swagger
@@ -133,6 +165,15 @@ router.post('/', subirCV, v.crear, validar, c.crear); // público (PB-09)
  *         schema:
  *           type: integer
  *           default: 20
+ *       - $ref: '#/components/parameters/Busqueda'
+ *       - $ref: '#/components/parameters/Desde'
+ *       - $ref: '#/components/parameters/Hasta'
+ *       - in: query
+ *         name: ordenarPor
+ *         schema:
+ *           type: string
+ *           enum: [id, createdAt, nombre, estado]
+ *       - $ref: '#/components/parameters/Dir'
  *       - in: query
  *         name: estado
  *         schema:
@@ -218,6 +259,9 @@ router.get('/:id', auth, soloAdmin, v.id, validar, c.obtener);
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/PostulacionEntrada'
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/PostulacionEntrada'
  *     responses:
  *       200:
  *         description: Postulación actualizada
@@ -236,7 +280,46 @@ router.get('/:id', auth, soloAdmin, v.id, validar, c.obtener);
  */
 router.put('/:id', auth, soloAdmin, subirCV, v.actualizar, validar, c.actualizar);
 
-// GET /api/postulaciones/:id/cv -> descarga del CV (solo admin)
+/**
+ * @swagger
+ * /postulaciones/{id}/cv:
+ *   get:
+ *     summary: Descargar el CV de una postulación (solo admin)
+ *     description: Los CV no son públicos; solo un administrador con token puede descargarlos.
+ *     tags: [Postulaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Archivo del CV (PDF, DOC o DOCX)
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *           application/msword:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *           application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: ID inválido
+ *       401:
+ *         description: Token ausente, inválido o vencido
+ *       403:
+ *         description: No tiene permisos de administrador
+ *       404:
+ *         description: Postulación sin CV, o no existe
+ */
 router.get('/:id/cv', auth, soloAdmin, v.id, validar, c.descargarCV);
 
 /**

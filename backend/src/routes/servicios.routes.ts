@@ -2,7 +2,7 @@ import { Router } from 'express';
 import c from '../controllers/servicio.controller';
 import * as v from '../validators/servicio.validator';
 import validar from '../middlewares/validar';
-import { auth, soloAdmin } from '../middlewares/auth';
+import { auth, authOpcional, soloAdmin } from '../middlewares/auth';
 import { subirImagen } from '../middlewares/subida';
 
 const router = Router();
@@ -37,6 +37,11 @@ const router = Router();
  *           type: string
  *           nullable: true
  *           example: ventas@opvdrywall.com
+ *         precioBase:
+ *           type: number
+ *           nullable: true
+ *           description: Precio de referencia para cotizar (solo se devuelve a administradores)
+ *           example: 250
  *         activo:
  *           type: boolean
  *           example: true
@@ -68,9 +73,18 @@ const router = Router();
  *           type: string
  *           maxLength: 120
  *           example: ventas@opvdrywall.com
+ *         precioBase:
+ *           type: number
+ *           nullable: true
+ *           minimum: 0
+ *           example: 250
  *         activo:
  *           type: boolean
  *           example: true
+ *         imagen:
+ *           type: string
+ *           format: binary
+ *           description: Imagen JPG, PNG o WebP (máximo 5 MB). Solo se envía en multipart/form-data
  */
 
 /**
@@ -90,6 +104,15 @@ const router = Router();
  *         schema:
  *           type: integer
  *           default: 20
+ *       - $ref: '#/components/parameters/Busqueda'
+ *       - $ref: '#/components/parameters/Desde'
+ *       - $ref: '#/components/parameters/Hasta'
+ *       - in: query
+ *         name: ordenarPor
+ *         schema:
+ *           type: string
+ *           enum: [id, createdAt, nombre, categoria]
+ *       - $ref: '#/components/parameters/Dir'
  *       - in: query
  *         name: activo
  *         schema:
@@ -121,7 +144,7 @@ const router = Router();
  *       400:
  *         description: Parámetros inválidos
  */
-router.get('/', v.listar, validar, c.listar); // público
+router.get('/', authOpcional, v.listar, validar, c.listar); // público
 
 /**
  * @swagger
@@ -147,7 +170,7 @@ router.get('/', v.listar, validar, c.listar); // público
  *       404:
  *         description: Servicio no encontrado
  */
-router.get('/:id', v.id, validar, c.obtener); // público
+router.get('/:id', authOpcional, v.id, validar, c.obtener); // público
 
 /**
  * @swagger
@@ -161,6 +184,12 @@ router.get('/:id', v.id, validar, c.obtener); // público
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ServicioEntrada'
+ *               - type: object
+ *                 required: [nombre, descripcion, categoria]
+ *         multipart/form-data:
  *           schema:
  *             allOf:
  *               - $ref: '#/components/schemas/ServicioEntrada'
@@ -181,6 +210,8 @@ router.get('/:id', v.id, validar, c.obtener); // público
  *         description: No tiene permisos de administrador
  *       409:
  *         description: Ya existe un servicio con ese nombre
+ *       413:
+ *         description: La imagen supera el tamaño máximo
  */
 router.post('/', auth, soloAdmin, subirImagen, v.crear, validar, c.crear);
 
@@ -202,6 +233,9 @@ router.post('/', auth, soloAdmin, subirImagen, v.crear, validar, c.crear);
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ServicioEntrada'
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/ServicioEntrada'
  *     responses:
