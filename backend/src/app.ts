@@ -17,7 +17,7 @@ const app = express();
 app.set('trust proxy', Number(process.env.TRUST_PROXY) || 0);
 
 // Sitios que pueden llamar a la API desde el navegador (CORS_ORIGINS en .env, separados por coma)
-const origenes = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,https://danzela1.github.io')
+const origenes = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,https://danzela1.github.io')
   .split(',')
   .map((s) => s.trim().replace(/\/+$/, ''))
   .filter(Boolean);

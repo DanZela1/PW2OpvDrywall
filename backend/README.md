@@ -152,6 +152,8 @@ Los listados aceptan `?pagina=1&limite=20` y devuelven `{ total, pagina, limite,
 | Preguntas frecuentes | `POST` · `PUT /:id` · `DELETE /:id` | Admin | - |
 | Categorías de galería | `GET /api/categorias-galeria` · `GET /:id` (solo activas) | Público | - |
 | Categorías de galería | `POST` · `PUT /:id` · `DELETE /:id` | Admin | - |
+| Fotos de galería | `GET /api/fotos-galeria?categoriaId=` · `GET /:id` (solo activas) | Público | - |
+| Fotos de galería | `POST` (imagen obligatoria) · `PUT /:id` · `DELETE /:id` | Admin | - |
 | Reportes | `GET /api/reportes/resumen` · `/cotizaciones-por-mes?meses=6` · `/cotizaciones-por-servicio` | Admin | - |
 
 ### Respuesta de error de validación (400)
@@ -207,7 +209,7 @@ rechazada -> pendiente (reabrir)        aceptada es final
 
 ## Listados: búsqueda, fechas y orden
 
-Todos los listados (`cotizaciones`, `contacto`, `postulaciones`, `proyectos`, `usuarios`, `servicios`, `testimonios`, `preguntas-frecuentes`, `categorias-galeria`) aceptan:
+Todos los listados (`cotizaciones`, `contacto`, `postulaciones`, `proyectos`, `usuarios`, `servicios`, `testimonios`, `preguntas-frecuentes`, `categorias-galeria`, `fotos-galeria`) aceptan:
 
 | Parámetro | Ejemplo | Qué hace |
 |---|---|---|
@@ -229,6 +231,7 @@ Todos los listados (`cotizaciones`, `contacto`, `postulaciones`, `proyectos`, `u
 
 - **Testimonios:** cualquiera puede enviar uno (`POST`, con foto opcional en el campo `foto`), pero nace `pendiente` y **no se publica** hasta que un admin lo aprueba con `PATCH /:id/estado`. Los visitantes solo ven los aprobados y sin datos privados (correo, estado).
 - **Preguntas frecuentes** y **categorías de galería:** los visitantes solo ven las activas y el admin las gestiona. Las preguntas se ordenan por el campo `orden`.
+- **Fotos de galería:** cada foto pertenece a una categoría (`categoriaId`) y su archivo se envía en el campo `imagen` (`multipart/form-data`), obligatorio al crear. Los visitantes solo ven las activas. Al eliminar una foto se borra su archivo; al eliminar una categoría, sus fotos quedan sin categoría.
 - `npm run seed` carga los 6 servicios, 6 categorías (una por servicio), 6 preguntas y los 4 testimonios del sitio. Los textos de las preguntas están redactados con las ideas del sitio: ajústalos desde Swagger para que coincidan palabra por palabra.
 
 ## Subida de archivos
@@ -238,6 +241,7 @@ La API acepta archivos con `multipart/form-data` (librería **multer**). Si no s
 | Dónde | Campo de archivo | Formatos | Visibilidad |
 |---|---|---|---|
 | `POST` y `PUT /api/servicios` (admin) | `imagen` | `.jpg`, `.png`, `.webp` | **Pública**: queda en `/uploads/imagenes/<archivo>` |
+| `POST` y `PUT /api/fotos-galeria` (admin) | `imagen` (obligatoria al crear) | `.jpg`, `.png`, `.webp` | **Pública**: queda en `/uploads/imagenes/<archivo>` |
 | `POST` (público) y `PUT /api/testimonios` (admin) | `foto` | `.jpg`, `.png`, `.webp` | **Pública**: queda en `/uploads/testimonios/<archivo>` |
 | `POST` (público) y `PUT /api/postulaciones` (admin) | `cv` | `.pdf`, `.doc`, `.docx` | **Privada**: solo el admin la descarga con `GET /api/postulaciones/:id/cv` |
 

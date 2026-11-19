@@ -11,7 +11,7 @@ const options: swaggerJsdoc.Options = {
       version: '3.2.0',
       description:
         'API REST de OPV Drywall: autenticación con JWT, cotizaciones, servicios, postulaciones con CV, ' +
-        'clientes, materiales, proyectos, testimonios, preguntas frecuentes, categorías de galería y reportes.\n\n' +
+        'clientes, materiales, proyectos, testimonios, preguntas frecuentes, categorías y fotos de galería y reportes.\n\n' +
         '**Cómo probar rutas protegidas:** haz POST /auth/login, copia el `token` de la respuesta, pulsa el botón ' +
         '**Authorize** y pégalo (sin escribir la palabra Bearer).\n\n' +
         '**Errores:** todas las rutas responden los errores con el mismo formato `{ "error": "mensaje" }` ' +
@@ -105,6 +105,7 @@ const ORDEN_TAGS = [
   'Testimonios',
   'Preguntas frecuentes',
   'Categorías de galería',
+  'Fotos de galería',
   'Clientes',
   'Materiales',
   'Reportes',
