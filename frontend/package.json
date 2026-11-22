@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Aplicaci\u00f3n React (TypeScript) de OPV Drywall. Pantallas vac\u00edas: la l\u00f3gica, el dise\u00f1o y el paso del sitio actual a React quedan pendientes.",
+  "description": "Aplicación React (TypeScript) de OPV Drywall. Pantallas vacías: la lógica, el diseño y el paso del sitio actual a React quedan pendientes.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -20,6 +20,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "less": "^4.9.1",
     "typescript": "~5.6.3",
     "vite": "^6.0.0"
   }
