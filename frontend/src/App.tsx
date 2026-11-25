@@ -1,6 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import Layout from './componentes/Layout';
 import PaginaVacia from './componentes/PaginaVacia';
+import RutaProtegida from './componentes/RutaProtegida';
 import PublicasCotizar from './paginas/publicas/Cotizar';
 import PublicasConsultaProyecto from './paginas/publicas/ConsultaProyecto';
 import PublicasServicios from './paginas/publicas/Servicios';
@@ -51,8 +52,11 @@ export default function App() {
           <Route path="registro" element={<CuentaRegistro />} />
           <Route path="olvide-password" element={<CuentaOlvidePassword />} />
           <Route path="restablecer" element={<CuentaRestablecerPassword />} />
-          <Route path="cuenta" element={<CuentaMiCuenta />} />
-          <Route path="cuenta/cotizaciones" element={<CuentaMisCotizaciones />} />
+          <Route element={<RutaProtegida rol="cliente" />}>
+            <Route path="cuenta" element={<CuentaMiCuenta />} />
+            <Route path="cuenta/cotizaciones" element={<CuentaMisCotizaciones />} />
+          </Route>
+          <Route element={<RutaProtegida rol="admin" />}>
           <Route path="admin" element={<AdminPanel />} />
           <Route path="admin/cotizaciones" element={<AdminCotizaciones />} />
           <Route path="admin/cotizaciones/nueva" element={<AdminCotizacionNueva />} />
@@ -68,6 +72,7 @@ export default function App() {
           <Route path="admin/postulaciones" element={<AdminPostulaciones />} />
           <Route path="admin/contactos" element={<AdminContactos />} />
           <Route path="admin/usuarios" element={<AdminUsuarios />} />
+          </Route>
           <Route path="*" element={<PaginaVacia titulo="Página no encontrada" />} />
         </Route>
       </Routes>

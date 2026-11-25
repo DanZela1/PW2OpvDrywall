@@ -27,7 +27,7 @@ export function notificarBienvenida(u: { nombre: string; correo: string }): void
 export const MINUTOS_ENLACE_RECUPERACION = 30;
 
 export function notificarRecuperacionPassword(u: { nombre: string; correo: string }, token: string): void {
-  const enlace = `${urlSitio()}/html/restablecer.html?token=${encodeURIComponent(token)}`;
+const enlace = `${urlSitio()}/#/restablecer?token=${encodeURIComponent(token)}`;
   const { html, texto } = construirCorreo({
     titulo: 'Recupera tu contraseña',
     saludo: `Hola ${u.nombre},`,
